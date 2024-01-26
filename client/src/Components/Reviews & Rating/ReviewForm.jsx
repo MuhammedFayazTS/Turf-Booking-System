@@ -4,6 +4,8 @@ import StarRating from './StarRating'
 import { addRatingAPI } from '../../Services/allAPIs'
 import { useParams } from 'react-router-dom'
 import toast from 'react-hot-toast'
+import { useDispatch } from 'react-redux'
+import { addRefresh } from '../../redux/alertSlice'
 
 function ReviewForm({close}) {
     const [reviewFormValue,setReviewFormValue] = useState({
@@ -11,6 +13,7 @@ function ReviewForm({close}) {
         message:''
     })
     const { id } = useParams()
+    const dispatch = useDispatch()
 
     const addRating = async()=>{
         const body ={
@@ -22,6 +25,7 @@ function ReviewForm({close}) {
             const response = await addRatingAPI(body)
             if(response.data.success) {
                 toast.success(response.data.message)
+                dispatch(addRefresh())
             }else{
                 toast.error(response.data.message)
             }

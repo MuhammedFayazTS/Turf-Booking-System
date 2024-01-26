@@ -27,7 +27,7 @@ function MyProfile() {
                             w='100%' h={'550'}
                             className='bg-slate-50 border border-slate-300 flex flex-col items-center py-10 '
                             rounded={'xl'} >
-                            <Avatar size={'xl'} name='Dan Abrahmov' src={user?.image} />
+                            <Avatar size={'xl'} name={user?.username} src={user?.image} />
                             <h3 className="mt-5 text-xl font-semibold">{user?.username}</h3>
                             <h6 className="text-md font-medium">{user?.phone}</h6>
                             <h6 className="text-sm">{user?.email}</h6>

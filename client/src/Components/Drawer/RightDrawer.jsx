@@ -25,10 +25,10 @@ import {
 import { SportsTypes, amenitiesFilter } from './FormData'
 
 function RightDrawer({ ...props }) {
-    const { setSort, setSports, sports,setSelectedAmenities,selectedAmenities,setPriceRange,priceRange,setFilter } = props
+    const { setSort, setSports, sports, setSelectedAmenities, selectedAmenities, setPriceRange, priceRange, setFilter } = props
     const { isOpen, onOpen, onClose } = useDisclosure()
     const btnRef = React.useRef()
-    
+
 
     const handleSliderChange = (newValues) => {
         setPriceRange(newValues);
@@ -40,7 +40,7 @@ function RightDrawer({ ...props }) {
 
     const handleAmenitiesChange = (values) => {
         setSelectedAmenities(values);
-      };
+    };
 
     return (
         <>
@@ -68,8 +68,10 @@ function RightDrawer({ ...props }) {
                                 <Select onChange={(e) => setSort(e.target.value)} placeholder='Sort by'>
                                     <option value={'price,asc'}>Lowest Price</option>
                                     <option value={'price,desc'}>Highest Price</option>
-                                    <option value={'createdAt,desc'}>Latest Turf</option>
-                                    <option value={'createdAt,asc'}>Oldest Turf</option>
+                                    <option value={'rating.stars,desc'}>Highest Rated</option>
+                                    <option value={'rating.stars,asc'}>Lowest Rated</option>
+                                    <option value={'createdAt,desc'}>Latest Added Turf</option>
+                                    <option value={'createdAt,asc'}>Earliest Added Turf</option>
                                 </Select>
                             </FormControl>
 
@@ -94,9 +96,9 @@ function RightDrawer({ ...props }) {
                             <FormControl>
                                 <FormLabel size={'md'}>Amenities :</FormLabel>
                                 <CheckboxGroup colorScheme='green'
-                                onChange={handleAmenitiesChange}
-                                value={selectedAmenities}
-                                defaultValue={[SportsTypes[0]]}>
+                                    onChange={handleAmenitiesChange}
+                                    value={selectedAmenities}
+                                    defaultValue={[SportsTypes[0]]}>
                                     <Stack spacing={[1, 5]} flexWrap={'wrap'} direction={['column', 'row']}>
                                         {
                                             amenitiesFilter?.map((amenity, index) => (
@@ -130,9 +132,11 @@ function RightDrawer({ ...props }) {
                             Cancel
                         </Button>
                         <Button
-                        onClick={(e)=>{setFilter(prev=>!prev)
-                        onClose()}}
-                        colorScheme='green'>Filter</Button>
+                            onClick={(e) => {
+                                setFilter(prev => !prev)
+                                onClose()
+                            }}
+                            colorScheme='green'>Filter</Button>
                     </DrawerFooter>
                 </DrawerContent>
             </Drawer>

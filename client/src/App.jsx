@@ -3,6 +3,8 @@ import { useSelector } from 'react-redux'
 import loader from './Assets/lottie/loader.json'
 import Lottie from 'react-lottie-player'
 import AllRoutes from './Routes/AllRoutes';
+import { ScrollToTop } from 'react-simple-scroll-up';
+import { ArrowUpIcon } from '@heroicons/react/24/solid';
 
 
 
@@ -25,6 +27,9 @@ function App() {
           style={{ width: 150, height: 150 }}
         />
       </div>}
+
+      <ScrollToTop className='z-20' strokeWidth={3} strokeFillColor={'#059669'} bgColor='#E2E8F0' symbol={<ArrowUpIcon className='w-6 h-6' />} />
+
 
       {/* routes */}
       <AllRoutes />

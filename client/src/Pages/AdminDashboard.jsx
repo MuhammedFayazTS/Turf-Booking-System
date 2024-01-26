@@ -2,10 +2,9 @@ import React, { useState } from 'react'
 import SidebarComponent from '../Components/Sidebar/SidebarComponent'
 import { Avatar, Button, IconButton, MenuButton, MenuDivider, MenuGroup, MenuList, Menu, MenuItem } from '@chakra-ui/react'
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/solid'
-import { ArrowUpIcon, BellIcon } from '@heroicons/react/24/outline'
+import {  BellIcon } from '@heroicons/react/24/outline'
 import { Outlet, useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
-import { ScrollToTop } from 'react-simple-scroll-up'
 
 function AdminDashboard() {
     const { user } = useSelector(state => state.user)
@@ -14,8 +13,6 @@ function AdminDashboard() {
     return (
         <div className='min-h-screen flex ' >
             <SidebarComponent collapsed={collapsed} />
-
-            <ScrollToTop className='z-20' strokeWidth={3} strokeFillColor={'#059669'} bgColor='#E2E8F0' symbol={<ArrowUpIcon className='w-6 h-6' />} />
 
             <div className='hidden md:block w-0 relative bg-transparent'>
                 <IconButton

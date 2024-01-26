@@ -5,7 +5,7 @@ const BookingModel = require("../models/bookingsModel");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const ratingModel = require("../models/ratingModel");
-const stripe = require('stripe')(process.env.STRIPE_SECRET)
+const stripe = require("stripe")(process.env.STRIPE_SECRET);
 
 const registerController = async (req, res) => {
   try {
@@ -110,6 +110,27 @@ const getUserInfoById = async (req, res) => {
     });
   }
 };
+
+// edit user details ----------------------------------------------------
+// ----------------------------------------------------------------------
+const editUserController = async (req, res) => {
+  const {username,email,image} = req.body
+  try {
+    const user = await User.findOne({ _id: req.body.userId});
+    if(!user){
+      return res.status(404).send({message: "User does not exist", success: false})
+    }else{
+      user.username =username?username:user.username
+      user.email = email?email:user.email
+      user.image = image?image:user.image
+      await user.save()
+      user.password = undefined
+      return res.status(200).send({message:"User info updated successfully.",success:true,data:user})
+    }
+  } catch (error) {
+    res.status(500).send({message:error.message});
+  }
+}
 
 // -----------------------------Notifications -----------------------------
 // ------------------------------------------------------------------------
@@ -243,10 +264,13 @@ const bookAppoimentController = async (req, res) => {
 // ---------------------------------------------------------------
 const getAllUserBookings = async (req, res) => {
   // filter according to status
-  let status = req.query.status || ''
-  let statusText = { $regex: status, $options: "i" }
+  let status = req.query.status || "";
+  let statusText = { $regex: status, $options: "i" };
   try {
-    const bookings = await BookingModel.find({ userId: req.body.userId,status:statusText })
+    const bookings = await BookingModel.find({
+      userId: req.body.userId,
+      status: statusText,
+    });
     res.send(bookings);
   } catch (error) {
     res.status(500).send({
@@ -272,59 +296,120 @@ const getAllVenueBookings = async (req, res) => {
   }
 };
 
-
 // ---------------------------------------------------------------
 // --------------------------- Rating ----------------------------
 const ratingController = async (req, res) => {
-  const {rate,message,venueId,userId} = req.body  
+  const { rate, message, venueId, userId } = req.body;
   try {
-      const existingRating = await ratingModel.findOne({userId,venueId})
-      if(existingRating){
-        return res.status(200).send({message: "Rating already added", success:false})
-      }else{
-        const newRating = await ratingModel.create({
-          rate,message,venueId,userId
-        })
-        await newRating.save()
-        return res.status(201).send({ message: "Rating added successfully", success: true });
+    const existingRating = await ratingModel.findOne({ userId, venueId });
+    const ratingVenue = await Venue.findOne({ _id: venueId });
+    if (existingRating) {
+      return res
+        .status(200)
+        .send({ message: "Rating already added", success: false });
+    } else {
+      const newRating = await ratingModel.create({
+        rate,
+        message,
+        venueId,
+        userId,
+      });
+      const updateRatingOfVenue = ratingVenue.rating;
+      let avg;
+      let stars = updateRatingOfVenue.stars || 0;
+      let count = updateRatingOfVenue.count || 0;
+      let { oneStar, twoStar, threeStar, fourStar, fiveStar } =
+        updateRatingOfVenue;
+      count += 1;
+      avg = (stars * (count - 1) + rate) / count; //count -1 because i incremented count before.
+      switch (rate) {
+        case 1:
+          oneStar += 1;
+          break;
+        case 2:
+          twoStar += 1;
+          break;
+        case 3:
+          threeStar += 1;
+          break;
+        case 4:
+          fourStar += 1;
+          break;
+        default:
+          fiveStar += 1;
       }
-    } catch (error) {
-      res.status(500).send({message: error.message,success:false})
+      ratingVenue.rating = {
+        stars: avg,
+        count: count,
+        oneStar,
+        twoStar,
+        threeStar,
+        fourStar,
+        fiveStar,
+      };
+      await ratingVenue.save();
+      await newRating.save();
+      return res
+        .status(201)
+        .send({
+          message: "Rating added successfully",
+          data: { ratingVenue },
+          success: true,
+        });
     }
-}
-
+  } catch (error) {
+    res.status(500).send({ message: error.message, success: false });
+  }
+};
 
 // ---------------------------------------------------------------
 // ------------------------Checkout controller--------------------
-const checkoutController = async(req, res) => {
-  const {products} = req.body;
-  const lineItems = products.map((product)=>({
-    price_data:{
-      currency:"usd",
-      product_data:{
-        name:product.name,
+const checkoutController = async (req, res) => {
+  const { products } = req.body;
+  const lineItems = products.map((product) => ({
+    price_data: {
+      currency: "usd",
+      product_data: {
+        name: product.name,
         // images:[product.venueInfo.images]
       },
-      unit_amount:product.price,
+      unit_amount: product.price,
     },
-    quantity:product.quantity || 1
-  }))
+    quantity: product.quantity || 1,
+  }));
   try {
     const session = await stripe.checkout.sessions.create({
-      payment_method_types:["card"],
-      line_items:lineItems,
-      mode:"payment",
-      success_url:"http://localhost:3000/",
-      cancel_url:"http://localhost:3000/asdssd"
-    })
+      payment_method_types: ["card"],
+      line_items: lineItems,
+      mode: "payment",
+      success_url: "http://localhost:3000/",
+      cancel_url: "http://localhost:3000/asdssd",
+    });
 
-    res.json({id:session.id})
+    res.json({ id: session.id });
   } catch (error) {
-    res.status(500)
-    .json({error:error.message})
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
+// ------------------------------------------------------------------------------
+// ----------------------Get user and venue count  for public--------------------
+const getTotalCount = async (req, res) => {
+  try {
+    const users = await User.find({isAdmin: false});
+    const venues =  await Venue.find()
+    if(users && venues){
+      let count = {
+        users: users.length,
+        venues: venues.length
+      }
+      res.status(200).json(count)
+    } 
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 }
-
 
 
 module.exports = {
@@ -338,5 +423,7 @@ module.exports = {
   getAllUserBookings,
   getAllVenueBookings,
   checkoutController,
-  ratingController
+  ratingController,
+  editUserController,
+  getTotalCount
 };

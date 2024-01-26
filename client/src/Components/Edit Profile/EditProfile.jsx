@@ -3,12 +3,16 @@ import { Formik, Form } from 'formik'
 import * as Yup from 'yup'
 import React, { useEffect, useRef, useState } from 'react'
 import TextField from '../Forms/Formik Components/TextField'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import { editUserInfoAPI } from '../../Services/allAPIs'
+import toast from 'react-hot-toast'
+import { setUser } from '../../redux/userSlice'
 
 function EditProfile() {
 
     const [profilePic, setProfilePic] = useState('')
     const { user } = useSelector(state => state.user)
+    const dispatch = useDispatch()
     const fileInputRef = useRef(null);
     const handleButtonClick = () => {
         if (fileInputRef.current) {
@@ -20,6 +24,22 @@ function EditProfile() {
         setProfilePic(img)
     };
 
+    const editUserProfile = async(body)=>{
+        try {
+            const response = await editUserInfoAPI(body)
+            if(response.data.success){
+                dispatch(setUser(response.data.data))
+                return toast.success(response.data.message);
+            }
+            else{
+                return toast.error("Error in editing user profile");
+            }
+        } catch (error) {
+            toast.error("Error in editing user profile");
+            console.log(error.message)
+        }
+    }
+
 
     const validate = Yup.object({
         username: Yup.string()
@@ -28,14 +48,6 @@ function EditProfile() {
         email: Yup.string()
             .email('Email is invalid')
             .required('Email is required'),
-        // password: Yup.string()
-        //     .min(6, 'Password must be at least 6 characters')
-        //     .required('Password is required'),
-        // confirmPassword: Yup.string()
-        //     .oneOf([Yup.ref('password'), null], 'Password must match')
-        //     .required('Confirm password is required'),
-        // otp: Yup.string()
-        // .required('OTP is required')
     })  //validate end
 
     useEffect(() => {
@@ -50,15 +62,11 @@ function EditProfile() {
                             initialValues={{
                                 username: user?.username || '', // Set user.username as initial value
                                 email: user?.email || '',
-                                // phone: '',
-                                // password: '',
-                                // confirmPassword: '',
-                                // otp: '',
                                 isOwner: false,
                             }} //initial values
                             validationSchema={validate}
                             onSubmit={values => {
-                                console.log(values)
+                                editUserProfile(values)
                             }
                             }
                         >

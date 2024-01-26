@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
 
-function DisplayStarRating({ rating }) {
+function DisplayStarRating({ rating,size }) {
     // const [rating, setRating] = useState(null)
     const [ratingColor, setRatingColor] = useState(null)
+    const style = size == 'lg'? 'h-6 w-6':"h-4 w-4"
     return (
         <>
             <span
@@ -25,7 +26,7 @@ function DisplayStarRating({ rating }) {
                                     viewBox="0 0 24 24"
                                     strokeWidth="1.5"
                                     stroke="currentColor"
-                                    className="h-4 w-4"
+                                    className={style}
                                 >
                                     <path
                                         strokeLinecap="round"

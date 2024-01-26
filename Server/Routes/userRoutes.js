@@ -1,5 +1,5 @@
 const express = require('express')
-const { registerController, loginController, getUserInfoById, getAdminInfo, markAllAsSeen, deleteAllNotifiications, updateReqStatus, bookAppoimentController, getAllUserBookings, getAllVenueBookings, getUserInfoByToken, checkoutController, ratingController } = require('../Controllers/userController')
+const { registerController, loginController, getUserInfoById, getAdminInfo, markAllAsSeen, deleteAllNotifiications, updateReqStatus, bookAppoimentController, getAllUserBookings, getAllVenueBookings, getUserInfoByToken, checkoutController, ratingController, editUserController, getTotalCount } = require('../Controllers/userController')
 const authMiddleware = require('../middlewares/authMiddleware')
 const router = express.Router()
 
@@ -11,6 +11,9 @@ router.post('/register',registerController)
 
 // login
 router.post('/login',loginController)
+
+// edit user info
+router.put('/edit',authMiddleware,editUserController)
 
 // get userinfo by id
 router.post('/get-user-info-by-id',authMiddleware,getUserInfoById)
@@ -36,6 +39,9 @@ router.post('/rating',authMiddleware,ratingController)
 
 // checkout section
 router.post('/checkout-session',checkoutController)
+
+// get total count for public
+router.get('/total-count',getTotalCount)
 
 
 module.exports = router

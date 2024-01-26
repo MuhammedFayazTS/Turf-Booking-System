@@ -40,11 +40,11 @@ const venueSchema = mongoose.Schema(
     },
     lightsOn: {
       type: Number,
-      default:'0',
+      default: "0",
     },
-    images:{
-      type:Array,
-      default:[]
+    images: {
+      type: Array,
+      default: [],
     },
     availableTimings: {
       type: Array,
@@ -52,12 +52,40 @@ const venueSchema = mongoose.Schema(
     },
     notAvailableTimings: {
       type: Array,
-      default:[]
+      default: [],
     },
-    status:{
-      type:String,
-      default:'pending'
-    }
+    status: {
+      type: String,
+      default: "pending",
+    },
+    rating: {
+      stars: {
+        type: Number,
+      },
+      count: {
+        type: Number,
+      },
+      oneStar: {
+        type: Number,
+        default:0
+      },
+      twoStar: {
+        type: Number,
+        default:0
+      },
+      threeStar: {
+        type: Number,
+        default:0
+      },
+      fourStar: {
+        type: Number,
+        default:0
+      },
+      fiveStar: {
+        type: Number,
+        default:0
+      },
+    },
   },
   {
     timestamps: true,

@@ -29,6 +29,11 @@ export const getUserInfoById = async(id)=>{
     return await commonAPI("post",`${BASE_URL}/api/user/get-user-info-by-id`,{id:id},headerConfig)
 }
 
+// edit user info
+export const editUserInfoAPI = async(reqBody)=>{
+    return await commonAPI("put",`${BASE_URL}/api/user/edit`,reqBody,headerConfig)
+}
+
 // ------------------------------  venue ---------------------------
 // -----------------------------------------------------------------
 
@@ -126,3 +131,9 @@ export const makePaymentAPI = async(body)=>{
     return commonAPI("post",`${BASE_URL}/api/user/checkout-session`,body,headerConfig)
 }
 
+
+// ------------------------------  Total count for public ---------------------------
+// -----------------------------------------------------------------------------------
+export const getTotalCountAPI = async()=>{
+    return commonAPI("get",`${BASE_URL}/api/user/total-count`,headerConfig)
+}

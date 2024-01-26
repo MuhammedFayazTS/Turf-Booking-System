@@ -7,14 +7,13 @@ import {
   Button,
   ButtonGroup
 } from '@chakra-ui/react'
-import { ArrowUpIcon, CheckBadgeIcon } from '@heroicons/react/24/solid'
+import {  CheckBadgeIcon } from '@heroicons/react/24/solid'
 import FeaturesCard from '../Components/Cards/FeaturesCard'
 import VenueCard from '../Components/Cards/VenueCard'
 import { ArrowForwardIcon } from '@chakra-ui/icons'
 import { Features } from '../Data/FeaturesData'
 import { CalendarDaysIcon } from '@heroicons/react/24/outline'
 import { useNavigate } from 'react-router-dom'
-import { ScrollToTop } from 'react-simple-scroll-up'
 import { setUser } from '../redux/userSlice'
 import { motion, AnimatePresence } from 'framer-motion'
 import sportsImage from '../Assets/lottie/sports.json'
@@ -81,8 +80,6 @@ function LandingPage() {
     <>
       <AnimatePresence mode="popLayout">
         <Header pos={'fixed'} />
-
-        <ScrollToTop className='z-20' strokeWidth={3} strokeFillColor={'#059669'} bgColor='#E2E8F0' symbol={<ArrowUpIcon className='w-6 h-6' />} />
 
         {/* section1 */}
         <section className='w-full h-screen bg-slate-100 flex flex-col-reverse md:flex-row items-center'>

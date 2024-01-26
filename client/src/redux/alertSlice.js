@@ -4,7 +4,8 @@ export const alertSlice = createSlice({
 
     name:"alerts",
     initialState:{
-        loading:false
+        loading:false,
+        refresh:false,
     },
     reducers:{
         showLoading:(state,action)=>{
@@ -12,11 +13,14 @@ export const alertSlice = createSlice({
         },
         hideLoading:(state,action)=>{
             state.loading = false;
+        },
+        addRefresh:(state)=>{
+            state.refresh = !state.refresh;
         }
     }
 
 })
 
 
-export const { showLoading, hideLoading } = alertSlice.actions
+export const { showLoading, hideLoading,addRefresh } = alertSlice.actions
 

@@ -14,7 +14,9 @@ function AboutUs() {
     return (
         <>
             <div>
-                <Header pos={'sticky'}  />
+                <Header pos={'sticky'} />
+
+
                 <div class="mx-auto max-w-7xl px-4">
                     <div class="flex flex-col space-y-8 pb-10 pt-12 md:pt-24">
                         <div class="max-w-max rounded-full border bg-gray-50 p-1 px-3">
@@ -63,7 +65,7 @@ function AboutUs() {
                             </p>
                             <p class="w-full text-base text-gray-700">Mon-Sat 9am to 5pm.</p>
                             <p class="text-sm font-medium">
-                            Info Park road, Bose nagar, Kakkanad, Ernakulam 682021 IN
+                                Info Park road, Bose nagar, Kakkanad, Ernakulam 682021 IN
                             </p>
                         </div>
                     </div>
@@ -186,7 +188,7 @@ function AboutUs() {
                     </div>
                 </div>
                 <div className='bg-gray-100'>
-                <hr class="mt-6" />
+                    <hr class="mt-6" />
                     <div class="mx-auto max-w-7xl ">
                         <Footer />
                     </div>

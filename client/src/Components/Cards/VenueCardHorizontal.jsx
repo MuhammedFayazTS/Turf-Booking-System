@@ -4,6 +4,7 @@ import { MapPinIcon } from '@heroicons/react/24/solid'
 import { AnimatePresence, motion } from 'framer-motion'
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
+import DisplayStarRating from '../Reviews & Rating/DisplayStarRating'
 
 
 const defaultImage = 'https://media.istockphoto.com/id/520999573/photo/indoor-soccer-football-field.jpg?s=612x612&w=0&k=20&c=X2PinGm51YPcqCAFCqDh7GvJxoG2WnJ19aadfRYk2dI='
@@ -13,7 +14,7 @@ function VenueCardHorizontal({ data }) {
     return (
         <>
             <Card
-                as={motion.div} initial={{ scale: .9,opacity:0}} whileInView={{ scale: 1,opacity:1 }} transition={{ duration: .6, type: 'tween' }} viewport={{once: true}}
+                as={motion.div} initial={{ scale: .9, opacity: 0 }} whileInView={{ scale: 1, opacity: 1 }} transition={{ duration: .6, type: 'tween' }} viewport={{ once: true }}
                 direction={{ base: 'column', sm: 'row' }}
                 overflow='hidden'
                 variant='outline'
@@ -31,9 +32,13 @@ function VenueCardHorizontal({ data }) {
 
                         <div className="flex space-x-2 items-center">
                             {/* for rating display */}
-                            <div className="bg-amber-500 text-white p-1.5 rounded-md text-sm font-medium">4.2</div>
-                            <p className='text-gray-600 text-md'>300 Reviews</p>
+                            {data?.rating?.stars &&
+                                <div className="bg-amber-500 w-8 text-white p-1.5 rounded-md text-sm font-medium flex justify-center">{data?.rating?.stars?.toFixed(1)}</div>
+                            }
+                            <DisplayStarRating rating={data?.rating?.stars} />
+                            <p className='text-gray-600 text-md'>{data?.rating?.count || 0} Reviews</p>
                         </div>
+
 
                         <Heading size='md'>{data.name}</Heading>
 

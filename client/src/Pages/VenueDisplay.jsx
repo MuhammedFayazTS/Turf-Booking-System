@@ -5,7 +5,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { EmailIcon, PhoneIcon } from '@chakra-ui/icons'
 import { Button, ButtonGroup, Divider, Grid, GridItem } from '@chakra-ui/react'
 import { CalendarDaysIcon, CheckCircleIcon, MapPinIcon } from '@heroicons/react/24/solid'
-import { CheckBadgeIcon } from '@heroicons/react/24/outline'
+import { CheckBadgeIcon, NoSymbolIcon } from '@heroicons/react/24/outline'
 import CourtPriceSlider from '../Components/Swiper/CourtPriceSlider'
 import { useDispatch, useSelector } from 'react-redux'
 import { hideLoading, showLoading } from '../redux/alertSlice'
@@ -17,7 +17,7 @@ import Reviews from '../Components/Reviews & Rating/Reviews'
 
 function VenueDisplay() {
     const navigation = useNavigate()
-    const { loading } = useSelector(state => state.alerts)
+    const { loading, refresh } = useSelector(state => state.alerts)
     const dispatch = useDispatch()
     const [venueDetails, setVenueDetails] = useState({})
     const { id } = useParams()
@@ -45,7 +45,7 @@ function VenueDisplay() {
 
     useEffect(() => {
         getVenueDetails()
-    }, [id])
+    }, [id, refresh])
 
     return (
         <>
@@ -67,13 +67,14 @@ function VenueDisplay() {
                             <motion.div
                                 initial={{ x: 50 }} whileInView={{ x: 0 }} transition={{ duration: .3, type: 'tween' }} viewport={{ once: true }}
                                 className='flex flex-wrap items-center gap-2'>
-                                <Link className="text-sm md:text-md">
+                                <Link target='blank' to={'tel:' + venueDetails?.phone} className="text-sm md:text-md">
                                     <PhoneIcon /> {venueDetails?.phone}
                                 </Link>
-                                <Link className="text-sm md:text-md">
+                                <Link target='blank' to={'mailto:' + venueDetails?.email} className="text-sm md:text-md">
                                     <EmailIcon /> {venueDetails?.email}
                                 </Link>
-                                <Link className="text-sm md:text-md flex items-center">
+                                <Link target='blank' to={`https://maps.google.com/maps?q=${encodeURIComponent(venueDetails?.location)}`}
+                                    className="text-sm md:text-md flex items-center">
                                     <MapPinIcon className='w-4 h-4' /> {venueDetails?.location}
                                 </Link>
                             </motion.div>
@@ -184,10 +185,10 @@ function VenueDisplay() {
                             initial={{ scale: .8 }} whileInView={{ scale: 1 }} transition={{ duration: .3, type: 'tween' }} viewport={{ once: true }}
                             rounded={'lg'} rowSpan={1} colSpan={6} bg='white' shadow={'lg'}
                         >
-                                <div className='grid grid-cols-2 gap-6 px-10 py-16'>
-                                        <Rating />
-                                        <Reviews />
-                                </div>
+                            <div className='grid grid-cols-2 gap-6 px-10 py-16'>
+                                <Rating rating={venueDetails?.rating} />
+                                <Reviews />
+                            </div>
 
                         </GridItem>
 

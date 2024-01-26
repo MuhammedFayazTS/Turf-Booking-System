@@ -2,9 +2,29 @@ import React, { useEffect, useState } from 'react'
 import { FaqData } from '../../Data/FaqData'
 import AnimatedNumbers from "react-animated-numbers";
 import { motion } from 'framer-motion';
+import { getTotalCountAPI } from '../../Services/allAPIs';
 
 function FAQ() {
-    const [numbers, setNumber] = useState(35)
+    const [totalCount, setTotalCount] = useState({
+        users:0,
+        venues:0
+    })
+
+    const fetchTotalCount = async()=>{
+        try {
+            const response = await getTotalCountAPI()
+            setTotalCount({
+                users: response?.data?.users,
+                venues: response?.data?.venues
+            })
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    useEffect(()=>{
+        fetchTotalCount()
+    },[])
 
     return (
         <>
@@ -26,32 +46,32 @@ function FAQ() {
                                 <div className="w-1/2 border-2 
                                 bg-[radial-gradient(ellipse_at_right,_var(--tw-gradient-stops))] from-sky-400 to-indigo-900
                                  flex flex-col justify-center px-5 rounded-md text-gray-300">
-                                    <p className="text-2xl font-semibold">
+                                    <p className="text-lg md:text-2xl font-semibold">
                                         Users
                                     </p>
                                     <p className="text-3xl font-extrabold inline-flex">
                                         <AnimatedNumbers
                                             includeComma
-                                            animateToNumber={numbers}
+                                            animateToNumber={totalCount.users}
                                         />+
                                     </p>
-                                    <p className='text-md font-medium'>
+                                    <p className='text-sm md:text-md font-medium'>
                                         Play Your Way: Unleash Your Game with Us.
                                     </p>
                                 </div>
                                 <div className="w-1/2 border-2 
                                 bg-[radial-gradient(ellipse_at_right,_var(--tw-gradient-stops))] from-lime-600 to-emerald-700 
                                 flex flex-col justify-center px-5 rounded-md text-gray-300">
-                                    <p className="text-2xl font-semibold">
+                                    <p className="text-lg md:text-2xl font-semibold">
                                         Courts
                                     </p>
                                     <p className="text-3xl font-extrabold inline-flex">
                                         <AnimatedNumbers
                                             includeComma
-                                            animateToNumber={45}
+                                            animateToNumber={totalCount.venues}
                                         />+
                                     </p>
-                                    <p className='text-md font-medium'>
+                                    <p className='text-sm md:text-md font-medium'>
                                         Well-maintained courts for optimal Game experiences.
                                     </p>
                                 </div>

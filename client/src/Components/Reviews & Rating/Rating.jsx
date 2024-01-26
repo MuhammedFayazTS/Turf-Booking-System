@@ -1,8 +1,9 @@
 import { Button } from '@chakra-ui/react'
 import React, { useState } from 'react'
 import ReviewForm from './ReviewForm'
+import DisplayStarRating from './DisplayStarRating'
 
-function Rating() {
+function Rating({rating}) {
     const [showRatingForm,setShowRatingForm] = useState(false)
 
     const handleShowRatingForm =(e) =>{
@@ -12,6 +13,12 @@ function Rating() {
         setShowRatingForm(false)
     }
 
+    const percentageOfStars = (total,starCount) =>{
+        let avg = starCount / total *100
+        return avg
+    }
+
+
     return (
         <>
             {/*        <!-- Component: Detailed Basic --> */}
@@ -20,7 +27,7 @@ function Rating() {
                 <h4 className="font-bold text-slate-700">Customer reviews</h4>
                 {/*          <!-- Rating --> */}
                 <span className="flex items-center gap-4 rounded text-sm text-slate-500">
-                    <span
+                    {/* <span
                         className="flex gap-1 text-amber-400"
                         role="img"
                         aria-label="Rating: 4 out of 5 stars"
@@ -97,12 +104,13 @@ function Rating() {
                                 />
                             </svg>
                         </span>
-                    </span>
-                    <span>4.1 out 5</span>
+                    </span> */}
+                    <DisplayStarRating size={'lg'} rating={rating?.stars || 0} />
+                    <span>{rating?.stars || 0.0} out 5</span>
                 </span>
                 {/*          <!-- Helper text --> */}
                 <span className="text-xs leading-6 text-slate-400">
-                    based on 147 user ratings
+                    based on {rating?.count || 0} user ratings
                 </span>
                 {/*          <!-- Detailed rating --> */}
                 <span className="flex w-full flex-col gap-4 pt-6">
@@ -118,12 +126,12 @@ function Rating() {
                             aria-labelledby="p03e-label"
                             id="p03e"
                             max="100"
-                            value="75"
+                            value={percentageOfStars(rating?.count,rating?.fiveStar)}
                             className="block h-3 w-full overflow-hidden rounded bg-slate-100 [&::-webkit-progress-bar]:bg-slate-100 [&::-webkit-progress-value]:bg-amber-400 [&::-moz-progress-bar]:bg-amber-400"
                         >
-                            75%
+                            {percentageOfStars(rating?.count,rating?.fiveStar)}%
                         </progress>
-                        <span className="w-9 text-xs font-bold text-slate-700">112 </span>
+                        <span className="w-9 text-xs font-bold text-slate-700">{rating?.fiveStar} </span>
                     </span>
                     <span className="flex w-full items-center gap-2">
                         <label
@@ -137,12 +145,12 @@ function Rating() {
                             aria-labelledby="p03e-label"
                             id="p03e"
                             max="100"
-                            value="28"
+                            value={percentageOfStars(rating?.count,rating?.fourStar)}
                             className="block h-3 w-full overflow-hidden rounded bg-slate-100 [&::-webkit-progress-bar]:bg-slate-100 [&::-webkit-progress-value]:bg-amber-400 [&::-moz-progress-bar]:bg-amber-400"
                         >
-                            75%
+                            {percentageOfStars(rating?.count,rating?.fourStar)}%
                         </progress>
-                        <span className="w-9 text-xs font-bold text-slate-700">17 </span>
+                        <span className="w-9 text-xs font-bold text-slate-700">{rating?.fourStar}</span>
                     </span>
                     <span className="flex w-full items-center gap-2">
                         <label
@@ -156,12 +164,12 @@ function Rating() {
                             aria-labelledby="p03e-label"
                             id="p03e"
                             max="100"
-                            value="18"
+                            value={percentageOfStars(rating?.count,rating?.threeStar)}
                             className="block h-3 w-full overflow-hidden rounded bg-slate-100 [&::-webkit-progress-bar]:bg-slate-100 [&::-webkit-progress-value]:bg-amber-400 [&::-moz-progress-bar]:bg-amber-400"
                         >
-                            75%
+                            {percentageOfStars(rating?.count,rating?.threeStar)}%
                         </progress>
-                        <span className="w-9 text-xs font-bold text-slate-700">12 </span>
+                        <span className="w-9 text-xs font-bold text-slate-700">{rating?.threeStar}</span>
                     </span>
                     <span className="flex w-full items-center gap-2">
                         <label
@@ -175,12 +183,12 @@ function Rating() {
                             aria-labelledby="p03e-label"
                             id="p03e"
                             max="100"
-                            value="8"
+                            value={percentageOfStars(rating?.count,rating?.twoStar)} 
                             className="block h-3 w-full overflow-hidden rounded bg-slate-100 [&::-webkit-progress-bar]:bg-slate-100 [&::-webkit-progress-value]:bg-amber-400 [&::-moz-progress-bar]:bg-amber-400"
                         >
-                            75%
+                            {percentageOfStars(rating?.count,rating?.twoStar)} %
                         </progress>
-                        <span className="w-9 text-xs font-bold text-slate-700">2 </span>
+                        <span className="w-9 text-xs font-bold text-slate-700">{rating?.twoStar}</span>
                     </span>
                     <span className="flex w-full items-center gap-2">
                         <label
@@ -194,12 +202,12 @@ function Rating() {
                             aria-labelledby="p03e-label"
                             id="p03e"
                             max="100"
-                            value="10"
+                            value={percentageOfStars(rating?.count,rating?.oneStar)}
                             className="block h-3 w-full overflow-hidden rounded bg-slate-100 [&::-webkit-progress-bar]:bg-slate-100 [&::-webkit-progress-value]:bg-amber-400 [&::-moz-progress-bar]:bg-amber-400"
                         >
-                            75%
+                            {percentageOfStars(rating?.count,rating?.oneStar)}%
                         </progress>
-                        <span className="w-9 text-xs font-bold text-slate-700">4 </span>
+                        <span className="w-9 text-xs font-bold text-slate-700">{rating?.oneStar}</span>
                     </span>
                 </span>
 
