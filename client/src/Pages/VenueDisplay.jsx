@@ -105,19 +105,19 @@ function VenueDisplay() {
                     >
                         <GridItem as={motion.div}
                             initial={{ scale: .8 }} whileInView={{ scale: 1 }} transition={{ duration: .3, type: 'tween' }} viewport={{ once: true }}
-                            rounded={'lg'} colSpan={{ base: 6, md: 4 }} bg='white' shadow={'lg'} >
+                            order={{ base: 1, md: 1 }}    rounded={'lg'} colSpan={{ base: 6, md: 4 }} bg='white' shadow={'lg'} >
                             <div className="w-full flex flex-col gap-y-2 p-5">
                                 <h4 className="text-2xl font-semibold bg-slate-50 p-2 rounded">
                                     Overview
                                 </h4>
                                 <Divider />
-                                <p className='text-md'>{venueDetails.overview}</p>
+                                <p className='text-md'>{venueDetails?.overview}</p>
                             </div>
                         </GridItem>
 
                         <GridItem as={motion.div}
                             initial={{ scale: .8 }} whileInView={{ scale: 1 }} transition={{ duration: .3, type: 'tween' }} viewport={{ once: true }}
-                            order={{ base: 3, md: 0 }} rounded={'lg'} rowSpan={2} colSpan={{ base: 6, md: 2 }} bg='white' shadow={'lg'} >
+                            order={{ base: 4, md: 2 }} rounded={'lg'} rowSpan={2} colSpan={{ base: 6, md: 2 }} bg='white' shadow={'lg'} >
                             <div className="w-full flex flex-col gap-y-3 p-5">
                                 <h4 className="text-2xl font-semibold bg-slate-50 p-2 rounded">
                                     Book A Court
@@ -139,7 +139,7 @@ function VenueDisplay() {
 
                         <GridItem as={motion.div}
                             initial={{ scale: .8 }} whileInView={{ scale: 1 }} transition={{ duration: .3, type: 'tween' }} viewport={{ once: true }}
-                            rounded={'lg'} rowSpan={1} colSpan={{ base: 6, md: 2 }} bg='white' shadow={'lg'} >
+                            order={{ base: 2, md: 3 }} rounded={'lg'} rowSpan={1} colSpan={{ base: 6, md: 2 }} bg='white' shadow={'lg'} >
                             <div className="w-full flex flex-col gap-y-3 p-5">
                                 <h4 className="text-2xl font-semibold bg-slate-50 p-2 rounded">
                                     Includes
@@ -161,7 +161,7 @@ function VenueDisplay() {
 
                         <GridItem as={motion.div}
                             initial={{ scale: .8 }} whileInView={{ scale: 1 }} transition={{ duration: .3, type: 'tween' }} viewport={{ once: true }}
-                            rounded={'lg'} rowSpan={1} colSpan={{ base: 6, md: 2 }} bg='white' shadow={'lg'} >
+                            order={{ base: 3, md: 4 }} rounded={'lg'} rowSpan={1} colSpan={{ base: 6, md: 2 }} bg='white' shadow={'lg'} >
                             <div className="w-full flex flex-col gap-y-3 p-5">
                                 <h4 className="text-2xl font-semibold bg-slate-50 p-2 rounded">
                                     Amenities
@@ -183,9 +183,9 @@ function VenueDisplay() {
 
                         <GridItem as={motion.div}
                             initial={{ scale: .8 }} whileInView={{ scale: 1 }} transition={{ duration: .3, type: 'tween' }} viewport={{ once: true }}
-                            rounded={'lg'} rowSpan={1} colSpan={6} bg='white' shadow={'lg'}
+                            order={5} rounded={'lg'} rowSpan={1} colSpan={6} bg='white' shadow={'lg'}
                         >
-                            <div className='grid grid-cols-2 gap-6 px-10 py-16'>
+                            <div className='grid md:grid-cols-2 gap-6 px-10 py-16'>
                                 <Rating rating={venueDetails?.rating} />
                                 <Reviews />
                             </div>

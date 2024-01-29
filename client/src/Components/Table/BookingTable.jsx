@@ -1,9 +1,16 @@
-import { Avatar, Badge, IconButton, Image } from '@chakra-ui/react'
+import {  Badge, IconButton, Image } from '@chakra-ui/react'
 import { EllipsisHorizontalIcon } from '@heroicons/react/24/solid'
 import { motion } from 'framer-motion'
 import moment from 'moment'
 import React from 'react'
+import {  useSelector } from 'react-redux'
+import TableMenuForAdmin from '../Menu/TableMenuForAdmin'
+import DeleteBookings from '../Modals/DeleteModalContents/DeleteBookings'
+
 function BookingTable({ data }) {
+
+    const { user } = useSelector(state => state.user)
+    
 
     const setColorByStatus = (status) => {
         if (status == 'success') {
@@ -17,6 +24,8 @@ function BookingTable({ data }) {
 
     return (
         <>
+        
+
             <motion.div
                 initial={{ scale: .85, opacity: 0 }} whileInView={{ scale: 1, opacity: 1 }} transition={{ duration: .4, type: 'spring' }} viewport={{ once: true }}
             >
@@ -82,9 +91,16 @@ function BookingTable({ data }) {
                                         </p>
                                     </td> */}
                                     <td className="px-6 py-4">
+                                        {
+                                        user?.isAdmin ?
+                                        <TableMenuForAdmin  isNotEditable  
+                                        deleteModalContent={<DeleteBookings data={booking} />}
+                                        />
+                                        :
                                         <IconButton isRound variant={'solid'} colorScheme='gray' >
                                             <EllipsisHorizontalIcon className="h-7 w-7" />
                                         </IconButton>
+                                        }
                                     </td>
                                 </tr>
                             ))

@@ -287,7 +287,7 @@ function BookingPage() {
                                         ))
                                     }
 
-                                    <Button onClick={makePayment} size='lg' colorScheme='whatsapp'>
+                                    <Button onClick={handleBooking} size='lg' colorScheme='whatsapp'>
                                         Proceed INR {bookings?.map((item) => item.price).reduce((item1, item2) => item1 + item2)}
                                     </Button>
 

@@ -14,7 +14,7 @@ const Header = ({ pos }) => {
     // change color of header
     const [color,setColor] = useState(false)
     const changeColor = ()=>{
-        if(window.scrollY >= 90){
+        if(window.scrollY >= 60){
             setColor(true)
         }else{
             setColor(false)

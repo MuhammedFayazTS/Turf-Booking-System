@@ -88,7 +88,7 @@ function UserMangementSection() {
                             </table>
                         </div>
                     </GridItem>
-                    <GridItem colSpan={3} w='100%'minH='350' h={'fit-content'} bg='white' shadow={'md'} rounded={'md'} p={3} >
+                    <GridItem colSpan={3} w='100%' h={'fit-content'} bg='white' shadow={'md'} rounded={'md'} p={3} >
                         <UsersTable data={users} />
                     </GridItem>
                 </Grid>

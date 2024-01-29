@@ -18,11 +18,10 @@ function TextField({ label, ...props }) {
     const [field, meta] = useField(props) //input field and its meta data
     // const [show, setShow] = React.useState(false)
     const handleClick = () => props.setShow(!props.show)
-    console.log("first",field)
     return (
         <div>
             <FormControl isInvalid={meta.error && meta.touched}>
-                <FormLabel>{label}</FormLabel>
+                {!props.noLabel && <FormLabel>{label}</FormLabel>}
                 <InputGroup size='lg'>
                     <Input variant='filled' size='lg' {...field} {...props}
                     value={field.value || ''} onChange={field.onChange} placeholder={label} />

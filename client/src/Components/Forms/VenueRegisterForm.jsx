@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { Button, Grid, GridItem,Stack } from '@chakra-ui/react'
+import React, { useRef, useState } from 'react'
+import { Button, FormControl, FormErrorMessage, FormHelperText, FormLabel, Grid, GridItem, Image, Stack } from '@chakra-ui/react'
 import { Form, Formik } from 'formik'
 import * as Yup from 'yup'
 import { useNavigate } from 'react-router-dom'
@@ -11,24 +11,48 @@ import TimingsCheckBoxControl from './Formik Components/TimingsCheckBoxControl'
 import { venueRegisterAPI } from '../../Services/allAPIs'
 import toast from 'react-hot-toast'
 import { useSelector } from 'react-redux'
+import { uploadVenuePics } from '../../Services/imageUploadAPI'
 
 
 function VenueRegisterForm() {
-    const navigate=useNavigate()
+    const navigate = useNavigate()
     const { user } = useSelector(state => state.user)
+    const [images, setImages] = useState([])
+    const [uploadLimit, setUploadLimit] = useState(false)
+    const uploadRef = useRef(null)
 
 
-    const registerVenue = async (venueDetails) =>{
-        try { 
-        const response = await venueRegisterAPI(venueDetails)
-        if(response.data.success){
-            toast.success(response.data.message)
-            navigate('/venue-list') // redirect to venue-list
-        }else{
-            toast.error(response.data.message)
-        }
-    } catch (error) {
+    const registerVenue = async (venueDetails) => {
+        try {
+            if(images.length < 3){
+                return toast.error('Add atleast three images!!')
+            }else{
+                let imgArr = []
+                for(let i = 0; i < images.length ;i++){
+                   const resImg = await uploadVenuePics(images[i],venueDetails.name) //response image
+                    imgArr.push(resImg)
+                }
+                Object.assign(venueDetails,{images: imgArr})
+                const response = await venueRegisterAPI(venueDetails)
+                if (response.data.success) {
+                    toast.success(response.data.message)
+                    navigate('/venue-list') // redirect to venue-list
+                } else {
+                    toast.error(response.data.message)
+                }
+            }
+        } catch (error) {
             toast.error('Something went wrong!')
+        }
+    }
+
+    const handleUploadChange = (e) => {
+        const chosenFiles = Array.prototype.slice.call(e.target.files)
+        if (images.length + chosenFiles.length > 10) {
+            setUploadLimit(true)
+        } else {
+            setUploadLimit(false)
+            setImages((prev) => [...prev, ...chosenFiles])
         }
     }
 
@@ -60,7 +84,7 @@ function VenueRegisterForm() {
         lightsOn: Yup.number()
             .min(100, 'Minimum of 100Rs')
             .max(999, 'Maximum of 999Rs')
-            .notRequired(),        
+            .notRequired(),
         include: Yup.array()
             .min(1, 'At least one item is required')
             .required('Includes is required'),
@@ -101,8 +125,8 @@ function VenueRegisterForm() {
                             <Grid templateColumns={{ base: 'repeat(1, 1fr)', md: 'repeat(2, 1fr)' }} gap={6} >
                                 {
                                     textfieldItems.map((item, index) => (
-                                        <GridItem colSpan={{ base: 2, md: 1 }} w='100%' h='fit-content' >
-                                            <TextField key={item.name + index} label={item.label} name={item.name} type={item.type} />
+                                        <GridItem key={item.name + index}  colSpan={{ base: 2, md: 1 }} w='100%' h='fit-content' >
+                                            <TextField  label={item.label} name={item.name} type={item.type} />
                                         </GridItem>
                                     ))
                                 }
@@ -135,10 +159,42 @@ function VenueRegisterForm() {
                                 </GridItem>
 
                                 <GridItem w='100%' colSpan={2} h='fit-content' >
-                                    <TextAreaControl  label='Overview' name='overview' />
+                                    <TextAreaControl label='Overview' name='overview' />
                                 </GridItem>
 
+                                <GridItem w='100%' colSpan={2} h='fit-content' >
+                                    <FormControl>
+                                        <FormLabel >Upload images</FormLabel>
+                                        <input accept='image/png,image/jpg,image/jpeg' multiple={true}
+                                            onChange={handleUploadChange} className='hidden' ref={uploadRef} type="file" />
 
+                                        <div className="flex gap-2 flex-wrap">
+                                            {
+                                                images.length>0 && images?.map((image, index) => (
+                                                    <Image key={index} boxSize={50}
+                                                        src={URL.createObjectURL(image)} />
+                                                ))
+                                            }
+                                        </div>
+                                        {
+                                            images.length > 0 &&
+                                            <div>
+                                                <FormHelperText >*1st image will be the chosen as card image.
+                                                </FormHelperText>
+                                                <FormHelperText color={'red'}>
+                                                   {images.length < 3 && ' *minimum 3 images should be added'}
+                                                   {uploadLimit && ' *maximum 10 images is allowed'}
+                                                </FormHelperText>
+                                            </div>
+                                        }
+                                    </FormControl>
+
+                                    <Button isDisabled={images.length >= 10 }
+                                        onClick={() => uploadRef.current && uploadRef.current.click()}
+                                        colorScheme='blackAlpha' size={'sm'} mt={2}
+                                    >Choose images</Button>
+
+                                </GridItem>
 
                             </Grid>
 

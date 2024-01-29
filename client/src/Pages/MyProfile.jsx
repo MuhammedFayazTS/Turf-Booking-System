@@ -37,7 +37,7 @@ function MyProfile() {
                                 className={`mt-5 w-full py-3 px-6 flex items-center ${location.pathname === '/my-profile' ? 'bg-green-600  text-gray-50' : 'hover:bg-green-100 hover:text-gray-700 text-gray-800'
                                     } gap-x-6`}
                             >
-                                <PencilIcon class="h-6 w-6" />
+                                <PencilIcon className="h-6 w-6" />
                                 Edit Profile
                             </Link>
 
@@ -46,7 +46,7 @@ function MyProfile() {
                                 className={`w-full py-3 px-6 flex items-center ${location.pathname === '/my-profile/my-bookings' ? 'bg-green-600  text-gray-50' : 'hover:bg-green-100 hover:text-gray-700 text-gray-800'
                                     } gap-x-6`}
                             >
-                                <BookmarkIcon class="h-6 w-6" />
+                                <BookmarkIcon className="h-6 w-6" />
                                 All Bookings
                             </Link>
 
@@ -55,7 +55,7 @@ function MyProfile() {
                                 className={`w-full py-3 px-6 flex items-center ${location.pathname === '/my-profile/notifications' ? 'bg-green-600  text-gray-50' : 'hover:bg-green-100 hover:text-gray-700 text-gray-800'
                                     } gap-x-6`}
                             >
-                                <BellIcon class="h-6 w-6" />
+                                <BellIcon className="h-6 w-6" />
                                 Notifications
                             </Link>
 

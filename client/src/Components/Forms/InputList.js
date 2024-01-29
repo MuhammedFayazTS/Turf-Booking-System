@@ -1,10 +1,29 @@
 import moment from "moment";
 
-export const includes = ["Badminton", "Football", "GreenTurf"];
+export const includes = [
+  "Football",
+  "Cricket",
+  "Badminton",
+  "Swimming",
+  "Basketball",
+  "Tennis",
+  "VolleyBall",
+  "Table Tennis",
+  "Boxing"
+];
 
-export const amenities = ["Parking", "Drinking Water", "Washroom","Food Court"];
+export const amenities = [
+  "Parking",
+  "Drinking Water",
+  "Washroom",
+  "Food Court",
+  "WiFi",
+  "Restroom",
+  "Seating Area",
+  "Storage System",
+  "First Aid Station"
+];
 
-export const coaching = ["Private Coaching", "Small Group Coaching", "Large Group Coaching"];
 
 export const textfieldItems = [
     { label: 'Venue Name', name: 'name', type: 'text' },

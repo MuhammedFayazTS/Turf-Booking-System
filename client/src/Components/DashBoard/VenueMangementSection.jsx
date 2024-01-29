@@ -97,7 +97,7 @@ function VenueMangementSection() {
                         </div>
                     </GridItem>
                     
-                    <GridItem colSpan={3} w='100%' minH='380'  bg='white' shadow={'md'} rounded={'md'} p={3} >
+                    <GridItem colSpan={3} w='100%'   bg='white' shadow={'md'} rounded={'md'} p={3} >
                         <VenueTable data={venues} />
                     </GridItem>
                 </Grid>

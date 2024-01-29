@@ -61,7 +61,7 @@ const getAllVenues = async (req, res) => {
     "Tennis",
     "VolleyBall",
     "Table Tennis",
-    "Swimming"
+    "Boxing"
   ];
   sports === "All"
     ? (sports = [...sportsOptions])
@@ -74,7 +74,10 @@ const getAllVenues = async (req, res) => {
     "Washroom",
     "Food Court",
     "WiFi",
-    "Restroom"
+    "Restroom",
+    "Seating Area",
+    "Storage System",
+    "First Aid Station"
   ];
   amenities === "All"
     ? (amenities = [...amenitiesOptions])

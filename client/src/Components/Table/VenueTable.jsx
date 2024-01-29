@@ -3,8 +3,15 @@ import { Badge, IconButton, Image } from '@chakra-ui/react'
 import { EllipsisHorizontalIcon } from '@heroicons/react/24/solid'
 import { motion } from 'framer-motion'
 import moment from 'moment'
+import { useSelector } from 'react-redux'
+import TableMenuForAdmin from '../Menu/TableMenuForAdmin'
+import EditVenueFormForAdmin from '../Forms/EditVenueFormForAdmin'
+import DeleteVenue from '../Modals/DeleteModalContents/DeleteVenue'
 
 function VenueTable({ data }) {
+
+    const { user } = useSelector(state => state.user)
+
     return (
         <>
             <motion.div
@@ -58,9 +65,17 @@ function VenueTable({ data }) {
                                         {moment(venue?.createdAt).format('DD-MM-YYYY')}
                                     </td>
                                     <td className="px-6 py-4">
-                                        <IconButton isRound variant={'solid'} colorScheme='gray' >
-                                            <EllipsisHorizontalIcon className="h-7 w-7" />
-                                        </IconButton>
+                                        {
+                                            user?.isAdmin ?
+                                                <TableMenuForAdmin
+                                                    editModalContent={<EditVenueFormForAdmin data={venue} />}
+                                                    deleteModalContent={<DeleteVenue data={venue} />}
+                                                />
+                                                :
+                                                <IconButton isRound variant={'solid'} colorScheme='gray' >
+                                                    <EllipsisHorizontalIcon className="h-7 w-7" />
+                                                </IconButton>
+                                        }
                                     </td>
                                 </tr>
                             ))

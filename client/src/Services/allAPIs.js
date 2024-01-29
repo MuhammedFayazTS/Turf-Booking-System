@@ -89,6 +89,50 @@ export const fetchAllBookingsAPI = async()=>{
 export const fetchAllUsersAPI = async()=>{
     return await commonAPI("get",`${BASE_URL}/api/admin/all-users`,"",headerConfig)
 }
+
+// remove user using id
+export const removeUserAPI = async(id)=>{
+    return await commonAPI("delete",`${BASE_URL}/api/admin/user/${id}`,"",headerConfig)
+}
+
+// remove venue using id
+export const removeVenuerAPI = async(id)=>{
+    return await commonAPI("delete",`${BASE_URL}/api/admin/venue/${id}`,"",headerConfig)
+}
+
+// remove Booking using id
+export const removeBookingAPI = async(id)=>{
+    return await commonAPI("delete",`${BASE_URL}/api/admin/booking/${id}`,"",headerConfig)
+}
+
+// edit user using id
+export const editUserByAdminAPI = async(data)=>{
+    const {id} = data
+    return await commonAPI("put",`${BASE_URL}/api/admin/user/${id}`,data,headerConfig)
+}
+
+// edit venue using id
+export const editVenueByAdminAPI = async(data)=>{
+    const {id} = data
+    return await commonAPI("put",`${BASE_URL}/api/admin/venue/${id}`,data,headerConfig)
+}
+// remove user using id
+export const removeUserByAdminAPI = async(id)=>{
+    return await commonAPI("delete",`${BASE_URL}/api/admin/user/${id}`,"",headerConfig)
+}
+
+// remove venue using id
+export const removeVenueByAdminAPI = async(id)=>{
+    return await commonAPI("delete",`${BASE_URL}/api/admin/venue/${id}`,"",headerConfig)
+}
+
+// remove venue using id
+export const removeBookingByAdminAPI = async(id)=>{
+    return await commonAPI("delete",`${BASE_URL}/api/admin/booking/${id}`,"",headerConfig)
+}
+
+
+
  
 
 // ------------------------------  booking ---------------------------
