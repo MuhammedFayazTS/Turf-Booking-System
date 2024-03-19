@@ -49,12 +49,12 @@ function FAQ() {
                                     <p className="text-lg md:text-2xl font-semibold">
                                         Users
                                     </p>
-                                    <p className="text-3xl font-extrabold inline-flex">
+                                    <div className="text-3xl font-extrabold inline-flex">
                                         <AnimatedNumbers
                                             includeComma
                                             animateToNumber={totalCount.users}
                                         />+
-                                    </p>
+                                    </div>
                                     <p className='text-sm md:text-md font-medium'>
                                         Play Your Way: Unleash Your Game with Us.
                                     </p>
@@ -65,12 +65,12 @@ function FAQ() {
                                     <p className="text-lg md:text-2xl font-semibold">
                                         Courts
                                     </p>
-                                    <p className="text-3xl font-extrabold inline-flex">
+                                    <div className="text-3xl font-extrabold inline-flex">
                                         <AnimatedNumbers
                                             includeComma
                                             animateToNumber={totalCount.venues}
                                         />+
-                                    </p>
+                                    </div>
                                     <p className='text-sm md:text-md font-medium'>
                                         Well-maintained courts for optimal Game experiences.
                                     </p>

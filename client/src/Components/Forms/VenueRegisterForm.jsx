@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react'
-import { Button, FormControl, FormErrorMessage, FormHelperText, FormLabel, Grid, GridItem, Image, Stack } from '@chakra-ui/react'
+import { Button, FormControl, FormErrorMessage, FormHelperText, FormLabel, Grid, GridItem, IconButton, Image, Stack } from '@chakra-ui/react'
 import { Form, Formik } from 'formik'
 import * as Yup from 'yup'
 import { useNavigate } from 'react-router-dom'
@@ -10,8 +10,10 @@ import TextAreaControl from './Formik Components/TextAreaControl'
 import TimingsCheckBoxControl from './Formik Components/TimingsCheckBoxControl'
 import { venueRegisterAPI } from '../../Services/allAPIs'
 import toast from 'react-hot-toast'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { uploadVenuePics } from '../../Services/imageUploadAPI'
+import { hideLoading, showLoading } from '../../redux/alertSlice'
+import { XMarkIcon } from '@heroicons/react/24/solid'
 
 
 function VenueRegisterForm() {
@@ -20,9 +22,11 @@ function VenueRegisterForm() {
     const [images, setImages] = useState([])
     const [uploadLimit, setUploadLimit] = useState(false)
     const uploadRef = useRef(null)
+    const dispatch = useDispatch()
 
 
     const registerVenue = async (venueDetails) => {
+        dispatch(showLoading())
         try {
             if(images.length < 3){
                 return toast.error('Add atleast three images!!')
@@ -34,6 +38,7 @@ function VenueRegisterForm() {
                 }
                 Object.assign(venueDetails,{images: imgArr})
                 const response = await venueRegisterAPI(venueDetails)
+                dispatch(hideLoading())
                 if (response.data.success) {
                     toast.success(response.data.message)
                     navigate('/venue-list') // redirect to venue-list
@@ -42,6 +47,7 @@ function VenueRegisterForm() {
                 }
             }
         } catch (error) {
+            dispatch(hideLoading())
             toast.error('Something went wrong!')
         }
     }
@@ -54,6 +60,11 @@ function VenueRegisterForm() {
             setUploadLimit(false)
             setImages((prev) => [...prev, ...chosenFiles])
         }
+    }
+
+    const removeFromImages =(index) =>{
+        let imgArray = images
+        setImages(imgArray.filter(image => image !== images[index]))
     }
 
     const validate = Yup.object({
@@ -168,11 +179,16 @@ function VenueRegisterForm() {
                                         <input accept='image/png,image/jpg,image/jpeg' multiple={true}
                                             onChange={handleUploadChange} className='hidden' ref={uploadRef} type="file" />
 
-                                        <div className="flex gap-2 flex-wrap">
+                                        <div className="flex gap-3 flex-wrap">
                                             {
                                                 images.length>0 && images?.map((image, index) => (
-                                                    <Image key={index} boxSize={50}
-                                                        src={URL.createObjectURL(image)} />
+                                                    <div className='w-50 h-50 relative'>
+                                                        <Image key={index} boxSize={50}
+                                                            src={URL.createObjectURL(image)} />
+                                                        <IconButton onClick={(e)=>removeFromImages(index)} position={'absolute'} top={-1} right={-1} isRound colorScheme='red' size={'xxs'} >
+                                                            <XMarkIcon className='w-4 h-4' />
+                                                        </IconButton>
+                                                    </div>
                                                 ))
                                             }
                                         </div>

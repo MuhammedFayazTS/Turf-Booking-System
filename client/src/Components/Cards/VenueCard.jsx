@@ -14,7 +14,7 @@ function VenueCard({ data }) {
 
       <Card
         as={motion.div} initial={{ scale: .9, opacity: 0 }} whileInView={{ scale: 1, opacity: 1 }} transition={{ duration: .6, type: 'tween' }} viewport={{ once: true }}
-        maxW='sm' h='100%' >
+        maxW='sm' h='100%'>
         <CardBody p={{ base: 0, md: '18px' }} >
           <Image
             src={data.images[0] ? data.images[0] : defaultImage}

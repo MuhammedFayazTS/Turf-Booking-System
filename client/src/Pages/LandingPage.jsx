@@ -22,20 +22,16 @@ import Footer from '../Components/Footer/Footer'
 import NewsLetterBox from '../Components/NewsLetterBox/NewsLetterBox'
 import FAQ from '../Components/FAQ/FAQ'
 
-
-
-
-
+// all imports ↑
 
 
 function LandingPage() {
-
   const navigation = useNavigate()
-  const { loading } = useSelector(state => state.alerts)
   const dispatch = useDispatch()
   const [allVenues, setAllVenues] = useState([])
-
-
+  
+  
+  // get user details
   const getUserData = async () => {
     dispatch(showLoading())
     try {
@@ -82,17 +78,17 @@ function LandingPage() {
         <Header pos={'fixed'} />
 
         {/* section1 */}
-        <section className='w-full h-screen bg-slate-100 flex flex-col-reverse md:flex-row items-center'>
+        <section  className='w-full h-screen bg-slate-100 flex flex-col-reverse md:flex-row items-center'>
 
           <div className='w-full md:w-3/5 h-1/2 md:h-full px-5  md:px-20 flex flex-col justify-start md:justify-center '>
             <motion.h5
               key="pre-heading"
               initial={{ x: -50, opacity: 0 }} whileInView={{ x: 0, opacity: 1 }} transition={{ delay: .1, duration: .6, type: 'tween' }} viewport={{ once: true }}
               className='text-sm md:text-md text-green-600' >Elite Courts & World Class Quality: Elevating Your Game Experience</motion.h5>
-            <motion.h1
+            <motion.h2
               key="main-heading"
               initial={{ x: -100, opacity: 0 }} whileInView={{ x: 0, opacity: 1 }} transition={{ duration: .6, type: 'tween' }} viewport={{ once: true }}
-              className='text-xl md:text-5xl font-bold' >Choose Your Court And Start Your Training</motion.h1>
+              className='text-xl md:text-5xl font-bold' >Choose Your Court And Start Your Training</motion.h2>
             <motion.h5
               initial={{ x: -50, opacity: 0 }} whileInView={{ x: 0, opacity: 1 }} transition={{ delay: .2, duration: .6, type: 'tween' }} viewport={{ once: true }}
               className='text-sm md:text-md' >
@@ -150,7 +146,7 @@ function LandingPage() {
             className=' mt-10 md:mt-16  flex flex-col md:flex-row  gap-y-5 md:gap-y-0 md:justify-between w-5/6'>
             {
               Features.map((feature, index) => (
-                <FeaturesCard key={index} feature={feature} />
+                <FeaturesCard key={feature.title} feature={feature} />
               ))
             }
           </motion.div>
@@ -170,8 +166,8 @@ function LandingPage() {
             initial={{ x: 50 }} whileInView={{ x: 0 }} transition={{ duration: .6, type: 'tween' }} viewport={{ once: true }}
             className='mt-10 md:mt-16 flex flex-col md:flex-row flex-wrap gap-y-5 md:gap-y-0 justify-between w-11/12 md:w-5/6'>
             {
-              allVenues?.length > 0 && allVenues?.map((venue, index) => (
-                <VenueCard key={"featuredVenue" + index} data={venue} />
+              allVenues?.length > 0 && allVenues?.map((venue) => (
+                <VenueCard key={venue._id} data={venue} />
               ))
 
             }

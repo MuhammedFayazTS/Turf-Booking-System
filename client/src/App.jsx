@@ -28,7 +28,7 @@ function App() {
         />
       </div>}
 
-      <ScrollToTop className='z-20' strokeWidth={3} strokeFillColor={'#059669'} bgColor='#E2E8F0' symbol={<ArrowUpIcon className='w-6 h-6' />} />
+      <ScrollToTop className='z-20' strokeWidth={3} strokeFillColor={'#166534'} bgColor={'#16A34A'} symbol={<ArrowUpIcon className='w-6 h-6 text-gray-200' />} />
 
 
       {/* routes */}

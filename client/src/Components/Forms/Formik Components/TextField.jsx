@@ -9,8 +9,10 @@ import {
     InputGroup,
     Button,
     InputRightElement,
+    IconButton,
 } from '@chakra-ui/react'
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
+import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline'
 
 
 function TextField({ label, ...props }) {
@@ -24,13 +26,16 @@ function TextField({ label, ...props }) {
                 {!props.noLabel && <FormLabel>{label}</FormLabel>}
                 <InputGroup size='lg'>
                     <Input variant='filled' size='lg' {...field} {...props}
-                    value={field.value || ''} onChange={field.onChange} placeholder={label} />
+                        value={field.value || ''} onChange={field.onChange} placeholder={label} />
                     <InputRightElement width='4.5rem'>
                         {
-                            field.name === 'password' && <Button h='1.75rem' size='sm' onClick={handleClick}>
-                                {props.show ? <ViewIcon /> : <ViewOffIcon />}
-                            </Button>
+                            (field.name === 'password' || field.name === 'confirmPassword') && (
+                                <IconButton size='sm' isRound onClick={handleClick}>
+                                    {props.show ? <EyeIcon class="h-6 w-6" /> : <EyeSlashIcon class="h-6 w-6" />}
+                                </IconButton>
+                            )
                         }
+
                     </InputRightElement>
                     {
                         props.name === 'otp' &&
@@ -39,7 +44,7 @@ function TextField({ label, ...props }) {
                         </InputRightElement>
                     }
                 </InputGroup>
-                    <FormErrorMessage>{meta.error}</FormErrorMessage>
+                <FormErrorMessage>{meta.error}</FormErrorMessage>
             </FormControl>
         </div>
     )

@@ -1,40 +1,39 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {
-    FormControl,
-    FormLabel,
-    FormHelperText,
-    Input,
-    Card,
-    CardBody,
-    CardHeader,
     Button,
     Stack,
     Radio,
-    RadioGroup
+    RadioGroup,
+    Image
 } from '@chakra-ui/react'
 
 import { Formik, Form } from 'formik'
 import * as Yup from 'yup'
 import TextField from '../Components/Forms/Formik Components/TextField'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { registerAPI } from '../Services/allAPIs'
 import toast from 'react-hot-toast'
+import { ArrowLongRightIcon } from "@heroicons/react/24/outline";
+import { CheckBadgeIcon } from '@heroicons/react/24/solid'
+
 
 function Register() {
 
-    const navigate=useNavigate()
+    const navigate = useNavigate()
+    const [showPass, setShowPass] = useState(false)
+    const [showConfirmPass, setShowConfirmPass] = useState(false)
 
-    const registerUser = async (userDetails) =>{
-        try { 
-        const response = await registerAPI(userDetails)
-        if(response.data.success){
-            toast.success(response.data.message)
-            toast.loading("redirecting to login page...",{duration: 2000})
-            navigate('/login') // redirect to login page
-        }else{
-            toast.error(response.data.message)
-        }
-    } catch (error) {
+    const registerUser = async (userDetails) => {
+        try {
+            const response = await registerAPI(userDetails)
+            if (response.data.success) {
+                toast.success(response.data.message)
+                toast.loading("redirecting to login page...", { duration: 2000 })
+                navigate('/login') // redirect to login page
+            } else {
+                toast.error(response.data.message)
+            }
+        } catch (error) {
             toast.error('Something went wrong!')
         }
     }
@@ -46,73 +45,102 @@ function Register() {
         email: Yup.string()
             .email('Email is invalid')
             .required('Email is required'),
-        // phone: Yup.number()
-        //     .min('Phone number should be 10 numbers')
-        //     .max('Phone number should be 10 numbers')
-        //     .required('Phone number is required'),
         password: Yup.string()
             .min(6, 'Password must be at least 6 characters')
             .required('Password is required'),
         confirmPassword: Yup.string()
             .oneOf([Yup.ref('password'), null], 'Password must match')
-            .required('Confirm password is required'),
-        otp: Yup.string()
-        .required('OTP is required')
+            .required('Confirm password is required')
     })  //validate end
     return (
         <>
-            <div className='flex w-full h-screen justify-center items-center bg-green-600'>
-                <Formik
-                    initialValues={{
-                        username: '',
-                        email: '',
-                        // phone: '',
-                        password: '',
-                        confirmPassword: '',
-                        otp:'',
-                        isOwner:false,
-                    }} //initial values
-                    validationSchema={validate}
-                    onSubmit={values=>{
-                        registerUser(values)
-                    }
-                    }
-                >
-                    {formik => (
-                        <div className='bg-green-50 w-1/3 p-6 rounded-lg shadow-xl'>
-                            <h4 className="antialiased hover:subpixel-antialiased text-gray-700 font-extrabold  text-2xl text-center mb-5">
-                            Get started with <span className='text-green-600'>SportSpotter</span>
-                            </h4>
-                            <Form className='flex flex-col space-y-4'>
+            <div className="grid grid-cols-2">
+
+                <div className="w-full overflow-hidden m-3 hidden md:block 
+                bg-cover bg-no-repeat bg-center rounded-md
+                bg-[linear-gradient(to_right_bottom,rgba(16,185,129,0.7),rgba(101,163,13,0.7)),url(https://media.istockphoto.com/id/1445090503/photo/kids-team-soccer-or-legs-with-soccer-ball-in-workout-fitness-game-or-exercise-on-nature-park.webp?b=1&s=170667a&w=0&k=20&c=le_PBWyGSTpfLs7OS22jtJp8-esV--6CjcIYHCqqcjk=)]">
+                    <div className='flex flex-col justify-end h-full w-full space-y-2 p-8 bg-black/30 text-white'>
+                        <span className="text-5xl font-bold">
+                            Now you dont have to rely on your designer to create a new page
+                        </span>
+                        <div className="flex space-x-3 flex-wrap">
+                            <span className='inline-flex items-center text-lg font-semibold'>
+                                <CheckBadgeIcon className='w-7 h-7 text-green-500' />
+                                Easy Booking
+                            </span>
+                            <span className='inline-flex items-center text-lg font-semibold'>
+                                <CheckBadgeIcon className='w-7 h-7 text-green-500' />
+                                Easy Booking
+                            </span>
+                            <span className='inline-flex items-center text-lg font-semibold'>
+                                <CheckBadgeIcon className='w-7 h-7 text-green-500' />
+                                Easy Booking
+                            </span>
+                            <span className='inline-flex items-center text-lg font-semibold'>
+                                <CheckBadgeIcon className='w-7 h-7 text-green-500' />
+                                Easy Booking
+                            </span>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div className='col-span-2 md:col-span-1 flex flex-col w-full h-screen justify-center items-center px-5 md:px-32'>
+                    <h2 className="self-start text-3xl font-bold leading-tight text-black sm:text-4xl">Sign up</h2>
+                    <p className="self-start mt-2 text-base text-gray-600">
+                        Already have an account?{' '}
+                        <Link
+                            to="/login"
+                            title=""
+                            className="font-medium text-black transition-all duration-200 hover:underline "
+                        >
+                            Sign In
+                        </Link>
+                    </p>
+
+                    <Formik
+                        initialValues={{
+                            username: '',
+                            email: '',
+                            password: '',
+                            confirmPassword: '',
+                            isOwner: false,
+                        }} //initial values
+                        validationSchema={validate}
+                        onSubmit={values => {
+                            registerUser(values)
+                        }
+                        }
+                    >
+                        {formik => (
+                            <Form className='flex flex-col space-y-4 w-full mt-6'>
                                 <RadioGroup className='self-center'
-                                name='isOwner' // Add a name to RadioGroup
-                                onChange={(value) => formik.setFieldValue('isOwner', value =='1'?false:true)} // Set the formik value on change
-                                defaultValue='1'>
+                                    name='isOwner' // Add a name to RadioGroup
+                                    onChange={(value) => formik.setFieldValue('isOwner', value == '1' ? false : true)} // Set the formik value on change
+                                    defaultValue='1'>
                                     <Stack spacing={5} direction='row'>
-                                        <Radio colorScheme='green' value='1'>
+                                        <Radio colorScheme='whatsapp' value='1'>
                                             I am a User
                                         </Radio>
-                                        <Radio colorScheme='green' value='2'>
+                                        <Radio colorScheme='whatsapp' value='2'>
                                             I am a Turf Owner
                                         </Radio>
                                     </Stack>
                                 </RadioGroup>
                                 <TextField label='Username' name='username' type='text' />
                                 <TextField label='Email' name='email' type='email' />
-                                {/* <TextField label='Phone' name='phone' type='number' /> */}
-                                <TextField label='Password' name='password' type='password' />
-                                <TextField label='Confirm Password' name='confirmPassword' type='password' />
-                                <TextField label='OTP' name='otp' type='text' />
-                                <Button colorScheme='green' type='submit'>Sign Up</Button>
-                                
+                                <TextField label='Password' name='password' type={showPass ? 'text' : 'password'} setShow={setShowPass} show={showPass} />
+                                <TextField label='Confirm Password' name='confirmPassword' type={showConfirmPass ? 'text' : 'password'} setShow={setShowConfirmPass} show={showConfirmPass} />
+                                <Button rightIcon={<ArrowLongRightIcon class="h-6 w-6" />}
+                                    colorScheme='whatsapp' type='submit'>Sign Up</Button>
+
                             </Form>
-                            <p className='text-center text-gray-500 mt-2'>already a user?
-                            <Button type='button' onClick={()=>navigate('/login')} variant='link' colorScheme='green'>login</Button>
-                            </p>
-                        </div>
-                    )}
-                </Formik>
+                        )}
+                    </Formik>
+                </div>
+
             </div>
+
         </>
     )
 }

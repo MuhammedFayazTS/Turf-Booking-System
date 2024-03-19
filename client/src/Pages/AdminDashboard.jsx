@@ -2,9 +2,9 @@ import React, { useState } from 'react'
 import SidebarComponent from '../Components/Sidebar/SidebarComponent'
 import { Avatar, Button, IconButton, MenuButton, MenuDivider, MenuGroup, MenuList, Menu, MenuItem } from '@chakra-ui/react'
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/solid'
-import {  BellIcon } from '@heroicons/react/24/outline'
 import { Outlet, useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
+import { BellIcon } from '@chakra-ui/icons'
 
 function AdminDashboard() {
     const { user } = useSelector(state => state.user)
@@ -40,13 +40,13 @@ function AdminDashboard() {
                         <div className="flex items-center space-x-4">
                             <IconButton
                                 className='relative'
-                                bg={'gray.800'} color={'white'} _hover={{ bg: 'gray.700' }} _active={{ bg: 'gray.900' }}
+                                bg={'transparent'} color={'black'} _hover={{ bgColor:'gray.100' }} 
                                 size={'lg'} isRound variant={'solid'} >
                                 <div onClick={() => navigate('/admin/notifications')} className='relative'>
-                                    <BellIcon className='w-5 h-5 md:w-7 md:h-7' />
+                                    <BellIcon fontSize={'x-large'} />
                                     {
                                         user?.unseenNotifications.length > 0 &&
-                                        <div className="w-5 h-5 bg-green-500 absolute -top-3 -right-3 rounded-full flex items-center justify-center">
+                                        <div className="w-5 h-5 absolute -top-3 -right-3 rounded-full flex items-center justify-center bg-green-500  text-white">
                                             <span className="text-sm">{user?.unseenNotifications.length}</span>
                                         </div>
                                     }

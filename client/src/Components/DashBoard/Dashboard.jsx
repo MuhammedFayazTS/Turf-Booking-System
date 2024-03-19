@@ -46,10 +46,10 @@ function Dashboard() {
                                         />
 
                                     </p>
-                                    <div className="flex items-center text-red-500 ">
+                                    {/* <div className="flex items-center text-red-500 ">
                                         <ArrowDownIcon className='w-3 h-3' />
                                         <p className="text-md font-medium">2.29%</p>
-                                    </div>
+                                    </div> */}
                                 </div>
                                 <Link to={item.to}
                                     className='text-lg font-semibold text-sky-600 hover:text-sky-700' >{item.button}</Link>

@@ -30,7 +30,7 @@ function NewsLetterBox({ isLight }) {
                                                 fill={index<=3?"currentColor":"none"}
                                                 stroke="currentColor"
                                                 stroke-width="2"
-                                                stroke-linecap="round"
+                                                strokeLinecap="round"
                                                 stroke-linejoin="round"
                                                 className="h-5 w-5 text-yellow-400"
                                             >

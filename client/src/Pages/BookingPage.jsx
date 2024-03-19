@@ -59,10 +59,13 @@ function BookingPage() {
             const result = await stripe.redirectToCheckout({
                 sessionId: response.data.id
             })
-
+            
             if (result.error) {
                 console.log(result.error)
+            }else{
+                await handleBooking()
             }
+
         } catch (error) {
             console.log(error)
         }
@@ -135,6 +138,7 @@ function BookingPage() {
                 price: venueInfo.price,
                 name: venueInfo.name,
                 availableTimings: venueInfo.availableTimings,
+                images:venueInfo?.images,
                 time,
                 date,
                 sport
@@ -157,7 +161,6 @@ function BookingPage() {
         getVenueInfoById()
         // getOwnerInfo()
     }, [params.id])
-
 
 
 
@@ -287,7 +290,7 @@ function BookingPage() {
                                         ))
                                     }
 
-                                    <Button onClick={handleBooking} size='lg' colorScheme='whatsapp'>
+                                    <Button onClick={makePayment} size='lg' colorScheme='whatsapp'>
                                         Proceed INR {bookings?.map((item) => item.price).reduce((item1, item2) => item1 + item2)}
                                     </Button>
 

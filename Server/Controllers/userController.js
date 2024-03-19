@@ -368,12 +368,12 @@ const checkoutController = async (req, res) => {
   const { products } = req.body;
   const lineItems = products.map((product) => ({
     price_data: {
-      currency: "usd",
+      currency: "inr",
       product_data: {
         name: product.name,
-        // images:[product.venueInfo.images]
+        images:product.images
       },
-      unit_amount: product.price,
+      unit_amount: product.price*100,
     },
     quantity: product.quantity || 1,
   }));
