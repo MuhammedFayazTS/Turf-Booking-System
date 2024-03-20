@@ -10,7 +10,7 @@
     A Turf Booking System built with the MERN stack allows users to reserve time slots on a sports turf online.
     <br/>
     <br/>
-    <a href="[./](https://github.com/MuhammedFayazTS/Turf-Booking-System.git)"><strong>Explore the docs »</strong></a>
+    <a href="https://github.com/MuhammedFayazTS/Turf-Booking-System.git"><strong>Explore the docs »</strong></a>
     <br/>
     <br/>
     <a href="https://github.com/MuhammedFayazTS/Turf-Booking-System.git">View Demo</a>
