@@ -1,11 +1,29 @@
 import mongoose from "mongoose";
-import jwt from "jsonwebtoken";
 import ejs from "ejs";
 import nodemailer from "nodemailer";
 import path from "path";
 import { asyncHandler } from "../../utils/asyncHandler.js";
-import { createAccessToken } from "../../utils/helper.js";
 import { ApiResponse } from "../../utils/ApiResponse.js";
+import Joi from "@hapi/joi";
+
+// user schema for validation
+const schema = Joi.object({
+  email: Joi.string().email().required(),
+  password: Joi.string().min(6).max(30).required(),
+  phone: Joi.string().min(8).max(15).required(),
+  username: Joi.string().min(4).max(10).required(),
+});
+
+//validation middleware function
+export const validate = (req, res, next) => {
+  const { error } = schema.validate(req.body);
+
+  if (error) {
+    return res.status(400).json(new ApiResponse(400,"Invalid request",error.details[0].message));
+  }
+
+  next();
+};
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -53,9 +71,12 @@ const sendEmailForAccountActivation = async (inputParams, url) => {
 };
 
 const signup = asyncHandler(async (req, res) => {
-  const inputParams = req.body;
+  // get data from frontend
+  // validate inputs
+  // check if user already exists
+  const { email, password, phone, username } = req.body;
 
-  console.log("Req  body: ",inputParams)
+  const inputParams = req.body;
 
   // const token = await createAccessToken(inputParams);
 
