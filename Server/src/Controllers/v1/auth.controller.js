@@ -16,6 +16,10 @@ const schema = Joi.object({
   username: Joi.string().min(4).max(12).required(),
 });
 
+const schemaForSignIn = schema.fork(["email", "phone", "username"], (field) =>
+  field.optional()
+);
+
 //validation middleware function
 export const signUpValidate = (req, res, next) => {
   const { error } = schema.validate(req.body);
@@ -26,8 +30,36 @@ export const signUpValidate = (req, res, next) => {
 
   next();
 };
+export const signInValidate = (req, res, next) => {
+  const { error } = schemaForSignIn.validate(req.body);
 
-const signup = asyncHandler(async (req, res) => {
+  if (error) {
+    return res.status(400).json(new ApiError(400, "All fields are required"));
+  }
+
+  next();
+};
+
+//generate access and refresh token
+const generateAccessAndRefreshToken = async (userId) => {
+  try {
+    const user = await User.findById(userId);
+    const accessToken = user.generateAccessToken();
+    const refreshToken = user.generateRefreshToken();
+
+    user.refreshToken = refreshToken;
+    await user.save({ validateBeforeSave: false });
+
+    return { accessToken, refreshToken };
+  } catch (error) {
+    throw new ApiError(
+      500,
+      "Something went wrong while generating access and refresh token"
+    );
+  }
+};
+
+const signUp = asyncHandler(async (req, res) => {
   const { email, password, phone, username } = req.body;
 
   const existedUser = await User.findOne({
@@ -69,4 +101,48 @@ const signup = asyncHandler(async (req, res) => {
     );
 });
 
-export { signup };
+const signIn = asyncHandler(async (req, res) => {
+  const { email, password, phone, username } = req.body;
+
+  const user = await User.findOne({
+    $or: [{ email }, { phone }, { username }],
+  });
+
+  if (!user) {
+    throw new ApiError(404, "User does not exist");
+  }
+
+  const isPasswordValid = await user.isPasswordCorrect(password);
+
+  if (!isPasswordValid) {
+    throw new ApiError(401, "Invalid user credentials");
+  }
+
+  const { accessToken, refreshToken } = await generateAccessAndRefreshToken(
+    user._id
+  );
+
+  const loggedInUser = await User.findById(user._id)
+    .select("-password -refreshToken")
+    .lean();
+
+  const options = {
+    httpOnly: true,
+    secure: true,
+    sameSite: "None",
+  };
+
+  res.cookie("accessToken", accessToken, options);
+  res.cookie("refreshToken", refreshToken, options);
+
+  return res.status(200).json(
+    new ApiResponse(200, {
+      user: loggedInUser,
+      // Uncomment below lines if you want to send tokens in the response body for mobile apps or local storage
+      // accessToken,
+      // refreshToken,
+    })
+  );
+});
+
+export { signUp, signIn };
