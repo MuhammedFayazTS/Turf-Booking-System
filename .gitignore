@@ -25,3 +25,5 @@ yarn-error.log*
 
 # env file server
 .env
+Server/.env
+Server/app.log
