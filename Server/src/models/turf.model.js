@@ -90,6 +90,6 @@ const turfSchema = new Schema(
   }
 );
 
-const Turf = model("Turf", turfSchema);
+const Turf = model("Turfs", turfSchema);
 
 export default Turf;
