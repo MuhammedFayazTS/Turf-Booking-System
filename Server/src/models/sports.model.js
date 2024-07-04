@@ -16,6 +16,14 @@ const sportsSchema = new Schema(
       type: mongoose.Types.ObjectId,
       ref: "User",
     },
+    updatedUserId: {
+      type: mongoose.Types.ObjectId,
+      ref: "User",
+    },
+    deletedUserId: {
+      type: mongoose.Types.ObjectId,
+      ref: "User",
+    },
   },
   {
     timestamps: true,
