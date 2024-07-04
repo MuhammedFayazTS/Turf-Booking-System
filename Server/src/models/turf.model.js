@@ -2,12 +2,22 @@ import mongoose from "mongoose";
 
 const { Schema, model } = mongoose;
 
+//TODO: add soft delete support
+
 const turfSchema = new Schema(
   {
     createdUserId: {
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
+    },
+    updatedUserId: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+    },
+    deletedUserId: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
     },
     name: {
       type: String,
