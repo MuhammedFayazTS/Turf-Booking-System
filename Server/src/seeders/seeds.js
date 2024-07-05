@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 import Sports from "../models/sports.model.js";
 import Amenities from "../models/amenity.model.js";
+import { timingOptions } from "./data/timing.options.js";
+import TimingOptions from "../models/timing.options.model.js";
 import path from "path";
 import { fileURLToPath } from "url";
 import dotenv from "dotenv";
@@ -17,6 +19,7 @@ const seedDb = async () => {
     // Clear the existing collections
     await Sports.deleteMany({});
     await Amenities.deleteMany({});
+    await TimingOptions.deleteMany({});
 
     // generate fake data
     const sportsData = generateFakeData(10, 1);
@@ -25,6 +28,7 @@ const seedDb = async () => {
     // add the data to the database
     await Sports.insertMany(sportsData);
     await Amenities.insertMany(amenitiesData);
+    await TimingOptions.insertMany(timingOptions);
 
     console.log("Seeders added");
   } catch (error) {
