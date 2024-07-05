@@ -8,9 +8,6 @@ import {
   sendNotification,
 } from "../../utils/notification.helper.js";
 
-//TODO: headle file saving.
-//TODO: add multer middleware and any cloud for image storing.
-
 // turf schema
 const schema = Joi.object({
   email: Joi.string().email().required(),
@@ -21,8 +18,8 @@ const schema = Joi.object({
   createdUserId: Joi.required(),
   location: Joi.required(),
   overview: Joi.required(),
-  sportsId: Joi.required(),
-  images: Joi.required(),
+  sportIds: Joi.array().min(1).required(),
+  timingsId: Joi.array().min(1).required(),
 });
 
 export const turfInputValidation = (req, res, next) => {
@@ -40,7 +37,7 @@ export const turfInputValidation = (req, res, next) => {
 };
 
 const create = asyncHandler(async (req, res) => {
-  const { email, phone, ...restBody } = req.body;
+  const { email, phone, name } = req.body;
 
   const existedTurf = await Turf.findOne({ $or: [{ email }, { phone }] });
 
@@ -56,10 +53,34 @@ const create = asyncHandler(async (req, res) => {
       );
   }
 
+  const files = req.files;
+
+  // Process multiple images
+  const uploadedImages = await Promise.all(
+    files.map(async (file) => await uploadFile(files, "images"))
+  );
+
+  // Process multiple documents
+  const uploadedDocuments = await Promise.all(
+    files.map(async (file) => await uploadFile(files, "documentsId"))
+  );
+
+  if (uploadedImages.includes(null) || uploadedDocuments.includes(null)) {
+    throw new ApiError(400, "Failed to upload images or documents");
+  }
+
   const createdUserRole = req.user.role;
   const status = createdUserRole === "admin" ? "approved" : "pending";
 
-  const newTurf = new Turf({ ...restBody, email, phone, status });
+  const newTurf = new Turf({
+    ...req.body,
+    email,
+    phone,
+    status,
+    images: uploadedImages,
+    documentsId: uploadedDocuments,
+    name: name.toLowerCase(),
+  });
   const createdTurf = await newTurf.save();
 
   if (!createdTurf) {
@@ -72,6 +93,7 @@ const create = asyncHandler(async (req, res) => {
     const message = `New turf adding request from ${req.user.username} to add ${createdTurf.name}`;
     const data = {
       turfId: createdTurf._id,
+      turfDocuments: createdTurf.documentsId,
       requestDate: new Date(),
     };
     sendAdminNotifications(title, message, "info", data);
@@ -79,7 +101,13 @@ const create = asyncHandler(async (req, res) => {
     const notificationTitleForOwner = "Turf Addition Request Sent Successfully";
     const notificationMessageForOwner =
       "Your request to add a new turf has been successfully submitted. Please await approval from the administrator.";
-    sendNotification(req.createdUserId, title, message, type, data);
+    sendNotification(
+      req.createdUserId,
+      notificationTitleForOwner,
+      notificationMessageForOwner,
+      type,
+      data
+    );
   }
 
   return res

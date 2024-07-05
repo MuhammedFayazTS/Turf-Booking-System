@@ -48,6 +48,13 @@ const turfSchema = new Schema(
       type: String,
       required: true,
     },
+    timingsId: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Timing",
+        required: true,
+      },
+    ],
     sportsId: [
       {
         type: Schema.Types.ObjectId,
