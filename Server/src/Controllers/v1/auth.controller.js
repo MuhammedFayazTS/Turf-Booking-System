@@ -8,6 +8,7 @@ import User from "../../models/user.model.js";
 import { asyncHandler } from "../../utils/asyncHandler.js";
 import { ApiResponse } from "../../utils/ApiResponse.js";
 import { ApiError } from "../../utils/ApiError.js";
+import { uploadFile } from "../../utils/helper.js";
 
 // user schema for validation
 const schema = Joi.object({
@@ -15,18 +16,23 @@ const schema = Joi.object({
   password: Joi.string().min(6).max(30).required(),
   phone: Joi.string().min(8).max(15).required(),
   username: Joi.string().min(4).max(12).required(),
+  role: Joi.string().required(),
 });
 
-const schemaForSignIn = schema.fork(["email", "phone", "username"], (field) =>
-  field.optional()
-);
+const schemaForSignIn = schema
+  .fork(["email", "phone", "username", "role"], (field) => field.optional())
+  .append({
+    role: Joi.any().strip(),
+  });
 
 //validation middleware function
 export const signUpValidate = (req, res, next) => {
   const { error } = schema.validate(req.body);
 
   if (error) {
-    return res.status(400).json(new ApiError(400, "All fields are required"));
+    return res
+      .status(400)
+      .json(new ApiError(400, "All fields are required", error));
   }
 
   next();
@@ -35,7 +41,9 @@ export const signInValidate = (req, res, next) => {
   const { error } = schemaForSignIn.validate(req.body);
 
   if (error) {
-    return res.status(400).json(new ApiError(400, "All fields are required"));
+    return res
+      .status(400)
+      .json(new ApiError(400, "All fields are required", error.message));
   }
 
   next();
@@ -60,7 +68,7 @@ const generateAccessAndRefreshToken = async (userId) => {
 };
 
 const signUp = asyncHandler(async (req, res) => {
-  const { email, password, phone, username } = req.body;
+  const { email, password, phone, username, role, image } = req.body;
 
   const existedUser = await User.findOne({
     $or: [{ email }, { username }, { phone }],
@@ -69,8 +77,15 @@ const signUp = asyncHandler(async (req, res) => {
   if (existedUser) {
     throw new ApiError(
       409,
-      (message = "User with email or username or phone number already exists")
+      "User with email or username or phone number already exists"
     );
+  }
+
+  const files = req.files
+  const uploadedImage = await uploadFile(files, 'image');
+
+  if (!uploadedImage) {
+    throw new ApiError(500, "Error in uploading file");
   }
 
   const user = await User.create({
@@ -78,6 +93,8 @@ const signUp = asyncHandler(async (req, res) => {
     username: username.toLowerCase(),
     password,
     phone,
+    role,
+    image: uploadedImage,
   });
 
   const createdUser = await User.findById(user._id).select(
@@ -218,4 +235,4 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
   }
 });
 
-export { signUp, signIn, signOut,refreshAccessToken };
+export { signUp, signIn, signOut, refreshAccessToken };

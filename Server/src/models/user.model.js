@@ -40,6 +40,10 @@ const userSchema = new Schema(
     refreshToken: {
       type: String,
     },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
     notifications: [
       {
         type: Schema.Types.ObjectId,
