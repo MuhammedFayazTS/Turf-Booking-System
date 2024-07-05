@@ -18,8 +18,18 @@ const schema = Joi.object({
   createdUserId: Joi.required(),
   location: Joi.required(),
   overview: Joi.required(),
-  sportIds: Joi.array().min(1).required(),
-  timingsId: Joi.array().min(1).required(),
+  sports: Joi.array().min(1).required(),
+  timings: Joi.array().min(1).required(),
+  options: Joi.array(),
+  ratings: Joi.array(),
+  additionalCharge: Joi.number(),
+  location: Joi.object().keys({
+    name: Joi.required(),
+    coordinates: Joi.object().keys({
+      latitude: Joi.string().required(),
+      longitude: Joi.string().required(),
+    }),
+  }),
 });
 
 export const turfInputValidation = (req, res, next) => {
