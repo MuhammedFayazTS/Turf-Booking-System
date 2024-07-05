@@ -6,12 +6,12 @@ const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     let { uploadDirectory = "common" } = req.body;
     // Determine upload directory based on file mimetype
-    let uploadDir = "./Public/temp";
+    let uploadDir = "./Server/public/temp";
 
     if (file.mimetype.startsWith("image")) {
-      uploadDir = `./Public/temp/images/${uploadDirectory}`;
+      uploadDir = `./Server/public/temp/images/${uploadDirectory}`;
     } else if (file.mimetype === "application/pdf") {
-      uploadDir = `./Public/temp/documents`;
+      uploadDir = `./Server/public/temp/documents`;
     }
 
     // Create directory if it doesn't exist

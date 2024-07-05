@@ -1,4 +1,6 @@
 import { Router } from "express";
+import { verifyJWT } from "../../middlewares/auth.middleware.js";
+import { upload } from "../../middlewares/multer.middleware.js";
 
 const router = Router();
 
@@ -11,10 +13,9 @@ import {
   signOut,
   refreshAccessToken,
 } from "../../Controllers/v1/auth.controller.js";
-import { verifyJWT } from "../../middlewares/auth.middleware.js";
 
 // routes
-router.route("/sign-up").post(signUpValidate, signUp);
+router.route("/sign-up").post(upload.any(), signUpValidate, signUp);
 router.route("/sign-in").post(signInValidate, signIn);
 
 //secured routes
