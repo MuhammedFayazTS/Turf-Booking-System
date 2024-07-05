@@ -25,7 +25,7 @@ const schema = Joi.object({
   images: Joi.required(),
 });
 
-export const createTurfInputValidation = (req, res, next) => {
+export const turfInputValidation = (req, res, next) => {
   const { error } = schema.validate(req.body);
 
   if (error) {

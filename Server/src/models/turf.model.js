@@ -51,7 +51,7 @@ const turfSchema = new Schema(
     sportsId: [
       {
         type: Schema.Types.ObjectId,
-        ref: "Sports",
+        ref: "Sport",
         required: true,
       },
     ],
@@ -73,6 +73,13 @@ const turfSchema = new Schema(
       type: [String],
       required: true,
     },
+    documentsId: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Document",
+        required: true,
+      },
+    ],
     status: {
       type: String,
       enum: ["pending", "approved", "rejected"],
