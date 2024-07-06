@@ -42,10 +42,14 @@ app.use(
 import healthcheckRouter from "./Routes/v1/healthcheck.routes.js";
 import authRouter from "./Routes/v1/auth.routes.js";
 import turfRouter from "./Routes/v1/turf.routes.js";
+import userRouter from "./Routes/v1/user.routes.js";
+import adminRouter from "./Routes/v1/admin.routes.js";
 
 //routes
 app.use("/api/v1/healthcheck", healthcheckRouter);
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/turf", turfRouter);
+app.use("/api/v1/user", userRouter);
+app.use("/api/v1/admin", adminRouter);
 
 export { app };

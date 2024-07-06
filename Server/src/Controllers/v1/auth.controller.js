@@ -1,5 +1,3 @@
-import mongoose from "mongoose";
-import ejs from "ejs";
 import Joi from "@hapi/joi";
 import nodemailer from "nodemailer";
 import path from "path";
@@ -15,15 +13,14 @@ const schema = Joi.object({
   email: Joi.string().email().required(),
   password: Joi.string().min(6).max(30).required(),
   phone: Joi.string().min(8).max(15).required(),
-  username: Joi.string().min(4).max(12).required(),
-  role: Joi.string().required(),
+  username: Joi.string().min(3).max(12).required(),
+  role: Joi.string().optional(),
 });
 
-const schemaForSignIn = schema
-  .fork(["email", "phone", "username", "role"], (field) => field.optional())
-  .append({
-    role: Joi.any().strip(),
-  });
+const schemaForSignIn = schema.fork(
+  ["email", "phone", "username", "role"],
+  (field) => field.optional()
+);
 
 //validation middleware function
 export const signUpValidate = (req, res, next) => {
@@ -32,7 +29,7 @@ export const signUpValidate = (req, res, next) => {
   if (error) {
     return res
       .status(400)
-      .json(new ApiError(400, "All fields are required", error));
+      .json(new ApiError(400, "All fields are required", error.message));
   }
 
   next();

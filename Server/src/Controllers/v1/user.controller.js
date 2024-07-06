@@ -38,8 +38,8 @@ export const changeUserRole = asyncHandler(async (req, res) => {
       message: `${req.user.username} request for changing role to "${role}"`,
       type: "info",
       data: {
-        approveUrl: `${process.env.SERVER_URL}/admin/${TypeConstants.USER_ROLE_CHANGE}/${createdUserId}/${role}/approve`,
-        rejectUrl: `${process.env.SERVER_URL}/admin/${TypeConstants.USER_ROLE_CHANGE}/${createdUserId}/${role}/reject`,
+        approveUrl: `${process.env.SERVER_URL}/admin/${TypeConstants.USER_ROLE_CHANGE}/${createdUserId}/approve/${role}`,
+        rejectUrl: `${process.env.SERVER_URL}/admin/${TypeConstants.USER_ROLE_CHANGE}/${createdUserId}/reject/${role}`,
       },
     };
 
