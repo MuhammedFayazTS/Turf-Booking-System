@@ -110,8 +110,8 @@ const create = asyncHandler(async (req, res, next) => {
     const data = {
       turfId: createdTurf._id,
       turfDocuments: createdTurf.documentsId,
-      approveUrl: `${process.env.SERVER_URL}/admin/${TypeConstants.TURF_CREATE_REQUEST}/${createdUserId}/approve`,
-      rejectUrl: `${process.env.SERVER_URL}/admin/${TypeConstants.TURF_CREATE_REQUEST}/${createdUserId}/reject`,
+      approveUrl: `${process.env.SERVER_URL}/admin/${TypeConstants.TAR}/${createdUserId}/approve`,
+      rejectUrl: `${process.env.SERVER_URL}/admin/${TypeConstants.TAR}/${createdUserId}/reject`,
       requestDate: new Date(),
     };
 

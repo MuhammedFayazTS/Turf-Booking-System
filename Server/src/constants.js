@@ -1,4 +1,4 @@
 export const TypeConstants = {
-    USER_ROLE_CHANGE: 'USER_ROLE_CHANGE',
-    TURF_CREATE_REQUEST: 'TURF_CREATE_REQUEST',
+    URC: 'URC',   //'USER_ROLE_CHANGE',
+    TAR: 'TAR'    //'TURF_CREATE_REQUEST',
   };

@@ -10,10 +10,10 @@ import Turf from "../../models/turf.model.js";
 export const adminApproveController = asyncHandler(async (req, res) => {
   const { type } = req.params;
   switch (type) {
-    case TypeConstants.USER_ROLE_CHANGE:
+    case TypeConstants.URC:
       await approveUserRoleChange(req, res);
       break;
-    case TypeConstants.TURF_CREATE_REQUEST:
+    case TypeConstants.TAR:
       await approveAddTurf(req, res);
       break;
     default:
