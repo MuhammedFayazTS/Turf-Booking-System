@@ -17,8 +17,8 @@ router
     verifyJWT,
     authorizeRole(["owner", "user"]),
     upload.any(),
-    turfInputValidation,
     attachUserId,
+    turfInputValidation,
     create
   );
 

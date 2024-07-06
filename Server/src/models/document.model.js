@@ -17,19 +17,6 @@ const documentSchema = new Schema(
       type: String,
       required: [true, "Name is required"],
     },
-    createdUserId: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
-    updatedUserId: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
-    },
-    deletedUserId: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
-    },
   },
   {
     timestamps: true,
