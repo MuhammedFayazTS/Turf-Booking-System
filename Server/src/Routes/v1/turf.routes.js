@@ -15,7 +15,7 @@ router
   .route("/create")
   .post(
     verifyJWT,
-    authorizeRole(["owner", "user"]),
+    authorizeRole(["owner", "admin"]),
     upload.any(),
     attachUserId,
     turfInputValidation,
