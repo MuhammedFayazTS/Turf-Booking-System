@@ -68,7 +68,7 @@ const generateAccessAndRefreshToken = async (userId) => {
 };
 
 const signUp = asyncHandler(async (req, res) => {
-  const { email, password, phone, username, role, image } = req.body;
+  const { email, password, phone, username, role } = req.body;
 
   const existedUser = await User.findOne({
     $or: [{ email }, { username }, { phone }],
@@ -77,7 +77,16 @@ const signUp = asyncHandler(async (req, res) => {
   if (existedUser) {
     throw new ApiError(
       409,
+      "User with email or username or phone number already exists",
       "User with email or username or phone number already exists"
+    );
+  }
+
+  if (role === "admin") {
+    throw new ApiError(
+      403,
+      "Only admin can assign admin role to users",
+      "Only admin can assign admin role to users"
     );
   }
 
