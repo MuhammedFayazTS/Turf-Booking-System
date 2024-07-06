@@ -9,8 +9,9 @@ const router = Router();
 import { adminApproveController } from "../../Controllers/v1/admin.controller.js";
 
 //secured routes
+//approve route
 router
-  .route("/:type/:userId/:role")
+  .route("/:type/:id/approve/:role?")
   .put(
     verifyJWT,
     authorizeRole(["admin"]),
