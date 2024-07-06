@@ -81,8 +81,8 @@ const signUp = asyncHandler(async (req, res) => {
     );
   }
 
-  const files = req.files
-  const uploadedImage = await uploadFile(files, 'image');
+  const files = req.files;
+  const uploadedImage = await uploadFile(files, "image");
 
   if (!uploadedImage) {
     throw new ApiError(500, "Error in uploading file");
@@ -227,8 +227,8 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 
     return res
       .status(200)
-      .cookie("access_token", accessToken)
-      .cookie("refresh_token", refreshToken)
+      .cookie("accessToken", accessToken, options)
+      .cookie("refreshToken", refreshToken, options)
       .json(new ApiResponse(200, {}, "Access Token refreshed"));
   } catch (error) {
     throw new ApiError(401, error?.message || "Invalid refresh token");
