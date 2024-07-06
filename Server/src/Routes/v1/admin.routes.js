@@ -6,7 +6,7 @@ import authorizeRole from "../../middlewares/authorize.role.middleware.js";
 const router = Router();
 
 // import controllers
-import { adminApproveController } from "../../Controllers/v1/admin.controller.js";
+import { adminApproveController, adminRejectController } from "../../Controllers/v1/admin.controller.js";
 
 //secured routes
 //approve route
@@ -17,6 +17,16 @@ router
     authorizeRole(["admin"]),
     attachUserId,
     adminApproveController
+  );
+
+//reject route
+router
+  .route("/:type/:id/reject/:role?")
+  .put(
+    verifyJWT,
+    authorizeRole(["admin"]),
+    attachUserId,
+    adminRejectController
   );
 
 export default router;
