@@ -48,10 +48,17 @@ const turfSchema = new Schema(
       type: String,
       required: true,
     },
+    timingsId: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Timing",
+        required: true,
+      },
+    ],
     sportsId: [
       {
         type: Schema.Types.ObjectId,
-        ref: "Sports",
+        ref: "Sport",
         required: true,
       },
     ],
@@ -73,6 +80,13 @@ const turfSchema = new Schema(
       type: [String],
       required: true,
     },
+    documentsId: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Document",
+        required: true,
+      },
+    ],
     status: {
       type: String,
       enum: ["pending", "approved", "rejected"],
@@ -90,6 +104,6 @@ const turfSchema = new Schema(
   }
 );
 
-const Turf = model("Turf", turfSchema);
+const Turf = model("Turfs", turfSchema);
 
 export default Turf;

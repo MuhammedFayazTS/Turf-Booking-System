@@ -41,9 +41,11 @@ app.use(
 //import routes
 import healthcheckRouter from "./Routes/v1/healthcheck.routes.js";
 import authRouter from "./Routes/v1/auth.routes.js";
+import turfRouter from "./Routes/v1/turf.routes.js";
 
 //routes
 app.use("/api/v1/healthcheck", healthcheckRouter);
 app.use("/api/v1/auth", authRouter);
+app.use("/api/v1/turf", turfRouter);
 
 export { app };
