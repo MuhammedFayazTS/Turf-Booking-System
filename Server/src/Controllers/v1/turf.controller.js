@@ -11,6 +11,7 @@ import {
 } from "../../utils/notification.helper.js";
 import { uploadFiles } from "../../utils/helper.js";
 import Document from "../../models/document.model.js";
+import { TypeConstants } from "../../constants.js";
 
 // turf schema
 const schema = Joi.object({
@@ -109,6 +110,8 @@ const create = asyncHandler(async (req, res, next) => {
     const data = {
       turfId: createdTurf._id,
       turfDocuments: createdTurf.documentsId,
+      approveUrl: `${process.env.SERVER_URL}/admin/${TypeConstants.TAR}/${createdUserId}/approve`,
+      rejectUrl: `${process.env.SERVER_URL}/admin/${TypeConstants.TAR}/${createdUserId}/reject`,
       requestDate: new Date(),
     };
 
