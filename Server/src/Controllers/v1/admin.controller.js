@@ -120,7 +120,7 @@ const approveAddTurf = async (req, res) => {
   res
     .status(200)
     .json(
-      new ApiResponse(200, updatedTurf, "Role change request has been approved")
+      new ApiResponse(200, updatedTurf, "Turf add request has been approved")
     );
 };
 

@@ -39,7 +39,11 @@ export const uploadFile = async (files, fieldname) => {
 //upload multiple files
 export const uploadFiles = async (files, fieldname) => {
   // Check if files array is empty or doesn't match the specified fieldname
-  if (!files || files.length === 0 || files.every(file => file.fieldname !== fieldname)) {
+  if (
+    !files ||
+    files.length === 0 ||
+    files.every((file) => file.fieldname !== fieldname)
+  ) {
     throw new ApiError(400, `No file uploaded for field '${fieldname}'`);
   }
 
@@ -79,4 +83,22 @@ export const generateFakeData = (limit, numberOfWords) => {
   }
 
   return data;
+};
+
+/**
+ * Helper function to calculate pagination parameters.
+ * @param {number} page - Current page number (default: 1).
+ * @param {number} limit - Number of items per page (default: 10).
+ * @returns {Object} Pagination parameters: skip, limitNum, pageNum.
+ */
+
+//get paginaation helper
+export const getPagination = (page = 1, limit = 10) => {
+  const limitNum = parseInt(limit, 10);
+  const pageNum = parseInt(page, 10);
+
+  // Calculate the number of documents to skip
+  const skip = (pageNum - 1) * limitNum;
+
+  return { skip, limitNum, pageNum };
 };

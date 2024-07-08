@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   create,
+  list,
   turfInputValidation,
 } from "../../Controllers/v1/turf.controller.js";
 import { attachUserId } from "../../middlewares/attachuserid.middleware.js";
@@ -21,5 +22,7 @@ router
     turfInputValidation,
     create
   );
+
+router.route("/list").get(verifyJWT, list);
 
 export default router;
