@@ -9,7 +9,7 @@ import {
   sendAdminNotifications,
   sendNotification,
 } from "../../utils/notification.helper.js";
-import { uploadFiles } from "../../utils/helper.js";
+import { getPagination, uploadFiles } from "../../utils/helper.js";
 import Document from "../../models/document.model.js";
 import { TypeConstants } from "../../constants.js";
 
@@ -46,7 +46,23 @@ export const turfInputValidation = (req, res, next) => {
 };
 
 const create = asyncHandler(async (req, res, next) => {
-  const { email, phone, name, timings, location, documents } = req.body;
+  const {
+    email,
+    phone,
+    name,
+    timings,
+    location,
+    documents,
+    sports,
+    amenities,
+    createdUserId,
+  } = req.body;
+
+  if (!createdUserId) {
+    return res
+      .status(404)
+      .json(new ApiResponse(400, {}, "Create user id not found"));
+  }
 
   const existedTurf = await Turf.findOne({ $or: [{ email }, { phone }] });
 
@@ -83,6 +99,8 @@ const create = asyncHandler(async (req, res, next) => {
     documentsId: [],
     timingsId: [],
     location,
+    sportsId: sports,
+    amenitiesId: amenities,
     name: name.toLowerCase(),
   });
   const createdTurf = await newTurf.save();
@@ -133,6 +151,45 @@ const create = asyncHandler(async (req, res, next) => {
   return res
     .status(201)
     .json(new ApiResponse(201, createdTurf, "Turf added successfully"));
+});
+
+const list = asyncHandler(async (req, res) => {
+  const { limit = 10, page = 1, search, location } = req.query;
+
+  // Create a search query if a search term is provided
+  const searchQuery = {
+    status: "approved",
+    ...(search && { name: { $regex: search, $options: "i" } }),
+    ...(location && { "location.name": { $regex: location, $options: "i" } }),
+  };
+
+  // Retrieve the total count of matching documents
+  const totalCount = await Turf.countDocuments(searchQuery);
+
+  const { limitNum, skip, pageNum } = getPagination(page, limit);
+
+  // Retrieve the paginated list of turfs
+  const turfs = await Turf.find(searchQuery).limit(limitNum).skip(skip);
+
+  if (!turfs || turfs.length === 0) {
+    return res.status(404).json(new ApiResponse(404, {}, "No turfs found"));
+  }
+
+  // Calculate the total number of pages
+  const totalPages = Math.ceil(totalCount / limitNum);
+
+  // Construct the response with pagination details
+  const response = {
+    totalCount,
+    totalPages,
+    currentPage: pageNum,
+    pageSize: limitNum,
+    turfs,
+  };
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, response, "Turf listed successfully"));
 });
 
 //helpers
@@ -194,4 +251,4 @@ const saveDocuments = async (files, documents, createdTurf) => {
   return await Document.insertMany(turfDocumentsData);
 };
 
-export { create };
+export { create, list };
