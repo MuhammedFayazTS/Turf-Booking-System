@@ -2,6 +2,8 @@ import { Router } from "express";
 import {
   create,
   list,
+  listForOwner,
+  getOne,
   turfInputValidation,
 } from "../../Controllers/v1/turf.controller.js";
 import { attachUserId } from "../../middlewares/attachuserid.middleware.js";
@@ -24,5 +26,9 @@ router
   );
 
 router.route("/list").get(verifyJWT, list);
+
+router.route("/list-for-owner").get(verifyJWT, listForOwner);
+
+router.route("/:id").get(verifyJWT, getOne);
 
 export default router;
