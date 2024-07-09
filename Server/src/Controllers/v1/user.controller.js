@@ -5,9 +5,44 @@ import { ApiError } from "../../utils/ApiError.js";
 import { ApiResponse } from "../../utils/ApiResponse.js";
 import { sendAdminNotifications } from "../../utils/notification.helper.js";
 import { TypeConstants } from "../../constants.js";
+import { getPagination } from "../../utils/helper.js";
+
+// list users
+const list = asyncHandler(async (req, res) => {
+  const { limit = 10, page = 1, search = "" } = req.query;
+
+  const searchQuery = {
+    _id: { $ne: req.user._id },
+    username: { $regex: search, $options: "i" },
+  };
+
+  const totalCount = await User.countDocuments(searchQuery);
+
+  const { limitNum, skip, pageNum } = getPagination(page, limit);
+
+  const users = await User.find(searchQuery).limit(limitNum).skip(skip);
+
+  if (!users || users.length === 0) {
+    return res.status(404).json(new ApiResponse(404, {}, "No users found"));
+  }
+
+  const totalPages = Math.ceil(totalCount / limitNum);
+
+  const response = {
+    totalCount,
+    totalPages,
+    currentPage: pageNum,
+    pageSize: limitNum,
+    users,
+  };
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, response, "Users listed successfully"));
+});
 
 // change user to owner or admin role
-export const changeUserRole = asyncHandler(async (req, res) => {
+const changeUserRole = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { role, createdUserId } = req.body;
   if (!id) {
@@ -68,3 +103,5 @@ export const changeUserRole = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, existedUser, "User role updated successfully"));
 });
+
+export { changeUserRole, list };
