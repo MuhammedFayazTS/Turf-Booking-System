@@ -20,7 +20,10 @@ const list = asyncHandler(async (req, res) => {
 
   const { limitNum, skip, pageNum } = getPagination(page, limit);
 
-  const users = await User.find(searchQuery).limit(limitNum).skip(skip);
+  const users = await User.find(searchQuery)
+    .limit(limitNum)
+    .skip(skip)
+    .select("-password");
 
   if (!users || users.length === 0) {
     return res.status(404).json(new ApiResponse(404, {}, "No users found"));
@@ -39,6 +42,44 @@ const list = asyncHandler(async (req, res) => {
   res
     .status(200)
     .json(new ApiResponse(200, response, "Users listed successfully"));
+});
+
+// get user details
+const getOne = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  if (!id) {
+    throw new ApiError(400, "Invalid user id", "Invalid user id");
+  }
+
+  const user = await User.findById(id).select("-password");
+
+  if (!user) {
+    return res.status(404).json(new ApiResponse(404, {}, "User not found"));
+  }
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, user, "User details loaded successfully"));
+});
+
+// get logged in user details
+const getLoggedInUser = asyncHandler(async (req, res) => {
+  const id = req.user._id;
+
+  if (!id) {
+    throw new ApiError(400, "Invalid user id", "Invalid user id");
+  }
+
+  const user = await User.findById(id).select("-password");
+
+  if (!user) {
+    return res.status(404).json(new ApiResponse(404, {}, "User not found"));
+  }
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, user, "User details loaded successfully"));
 });
 
 // change user to owner or admin role
@@ -104,4 +145,4 @@ const changeUserRole = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, existedUser, "User role updated successfully"));
 });
 
-export { changeUserRole, list };
+export { changeUserRole, list, getOne,getLoggedInUser };
