@@ -235,6 +235,23 @@ const listForOwner = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, response, "Turfs listed successfully"));
 });
 
+const getOne = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  if (!id) {
+    throw new ApiError(400, "Invalid turf id", "Invalid turf id");
+  }
+
+  const turf = await Turf.findById(id);
+
+  if (!turf) {
+    return res.status(404).json(new ApiResponse(404, {}, "Turf not found"));
+  }
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, turf, "Turf details loaded successfully"));
+});
+
 //helpers
 const getTimings = async (timings, createdTurf) => {
   // Check if timings array is provided and not empty
@@ -294,4 +311,4 @@ const saveDocuments = async (files, documents, createdTurf) => {
   return await Document.insertMany(turfDocumentsData);
 };
 
-export { create, list, listForOwner };
+export { create, list, listForOwner, getOne };
