@@ -154,19 +154,17 @@ const create = asyncHandler(async (req, res, next) => {
 });
 
 const list = asyncHandler(async (req, res) => {
-  const {
-    limit = 10,
-    page = 1,
-    search,
-    location,
-    status = "approved",
-  } = req.query;
+  const { limit = 10, page = 1, search = "", status = "approved" } = req.query;
 
   // Create a search query if a search term is provided
   const searchQuery = {
     status,
-    ...(search && { name: { $regex: search, $options: "i" } }),
-    ...(location && { "location.name": { $regex: location, $options: "i" } }),
+    ...(search && {
+      $or: [
+        { name: { $regex: search, $options: "i" } },
+        { "location.name": { $regex: search, $options: "i" } },
+      ],
+    }),
   };
 
   // Retrieve the total count of matching documents
@@ -199,12 +197,16 @@ const list = asyncHandler(async (req, res) => {
 });
 
 const listForOwner = asyncHandler(async (req, res) => {
-  const { limit = 10, page = 1, search, location } = req.query;
+  const { limit = 10, page = 1, search = "" } = req.query;
 
   const searchQuery = {
     createdUserId: req.user._id,
-    ...(search && { name: { $regex: search, $options: "i" } }),
-    ...(location && { "location.name": { $regex: location, $options: "i" } }),
+    ...(search && {
+      $or: [
+        { name: { $regex: search, $options: "i" } },
+        { "location.name": { $regex: search, $options: "i" } },
+      ],
+    }),
   };
 
   const totalCount = await Turf.countDocuments(searchQuery);
