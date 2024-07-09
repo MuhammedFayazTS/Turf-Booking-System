@@ -154,11 +154,17 @@ const create = asyncHandler(async (req, res, next) => {
 });
 
 const list = asyncHandler(async (req, res) => {
-  const { limit = 10, page = 1, search, location } = req.query;
+  const {
+    limit = 10,
+    page = 1,
+    search,
+    location,
+    status = "approved",
+  } = req.query;
 
   // Create a search query if a search term is provided
   const searchQuery = {
-    status: "approved",
+    status,
     ...(search && { name: { $regex: search, $options: "i" } }),
     ...(location && { "location.name": { $regex: location, $options: "i" } }),
   };
@@ -190,6 +196,43 @@ const list = asyncHandler(async (req, res) => {
   res
     .status(200)
     .json(new ApiResponse(200, response, "Turf listed successfully"));
+});
+
+const listForOwner = asyncHandler(async (req, res) => {
+  const { limit = 10, page = 1, search, location } = req.query;
+
+  const searchQuery = {
+    createdUserId: req.user._id,
+    ...(search && { name: { $regex: search, $options: "i" } }),
+    ...(location && { "location.name": { $regex: location, $options: "i" } }),
+  };
+
+  const totalCount = await Turf.countDocuments(searchQuery);
+
+  const { limitNum, skip, pageNum } = getPagination(page, limit);
+
+  // Retrieve the paginated list of turfs
+  const turfs = await Turf.find(searchQuery).limit(limitNum).skip(skip);
+
+  if (!turfs || turfs.length === 0) {
+    return res.status(404).json(new ApiResponse(404, {}, "No turfs found"));
+  }
+
+  // Calculate the total number of pages
+  const totalPages = Math.ceil(totalCount / limitNum);
+
+  // Construct the response with pagination details
+  const response = {
+    totalCount,
+    totalPages,
+    currentPage: pageNum,
+    pageSize: limitNum,
+    turfs,
+  };
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, response, "Turfs listed successfully"));
 });
 
 //helpers
@@ -251,4 +294,4 @@ const saveDocuments = async (files, documents, createdTurf) => {
   return await Document.insertMany(turfDocumentsData);
 };
 
-export { create, list };
+export { create, list, listForOwner };
