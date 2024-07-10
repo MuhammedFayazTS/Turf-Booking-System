@@ -2,6 +2,7 @@ import mongoose, { Schema, model } from "mongoose";
 import MongooseDelete from "mongoose-delete";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import aggregatePaginate from "mongoose-aggregate-paginate-v2";
 
 const userSchema = new Schema(
   {
@@ -96,6 +97,7 @@ userSchema.methods.generateRefreshToken = async function () {
 };
 
 userSchema.plugin(MongooseDelete, { deletedBy: true, deletedAt: true });
+userSchema.plugin(aggregatePaginate);
 
 const User = model("User", userSchema);
 
