@@ -4,7 +4,9 @@ import {
   list,
   listForOwner,
   getOne,
+  updateTurfDetails,
   turfInputValidation,
+  validateUpdateTurfInput,
 } from "../../Controllers/v1/turf.controller.js";
 import { attachUserId } from "../../middlewares/attachuserid.middleware.js";
 import { verifyJWT } from "../../middlewares/auth.middleware.js";
@@ -30,5 +32,14 @@ router.route("/list").get(verifyJWT, list);
 router.route("/list-for-owner").get(verifyJWT, listForOwner);
 
 router.route("/:id").get(verifyJWT, getOne);
+
+router
+  .route("/:id")
+  .put(
+    verifyJWT,
+    validateUpdateTurfInput,
+    authorizeRole(["owner", "admin"]),
+    updateTurfDetails
+  );
 
 export default router;

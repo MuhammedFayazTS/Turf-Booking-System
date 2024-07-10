@@ -33,6 +33,16 @@ const schema = Joi.object({
   documents: Joi.array().required(),
 });
 
+// Forked schema for update operation
+const updateSchema = schema.keys({
+  _id: Joi.required(),
+  createdUserId: Joi.optional(),
+  updatedUserId: Joi.any().optional(),
+  deletedUserId: Joi.any().optional(),
+  timings: Joi.forbidden(),
+  documents: Joi.forbidden(),
+});
+
 export const turfInputValidation = (req, res, next) => {
   const { error } = schema.validate(req.body);
 
@@ -40,6 +50,18 @@ export const turfInputValidation = (req, res, next) => {
     return res
       .status(400)
       .json(new ApiError(400, "All fields are required", error.message));
+  }
+
+  next();
+};
+
+export const validateUpdateTurfInput = (req, res, next) => {
+  const { error } = updateSchema.validate(req.body);
+
+  if (error) {
+    return res
+      .status(400)
+      .json(new ApiError(400, "Input validation error", error.message));
   }
 
   next();
@@ -318,6 +340,67 @@ const getOne = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, turf, "Turf details loaded successfully"));
 });
 
+const updateTurfDetails = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  if (!id) {
+    throw new ApiError(400, "Invalid turf ID");
+  }
+
+  const {
+    email,
+    phone,
+    name,
+    overview,
+    location,
+    sports,
+    amenities,
+    price,
+    additionalCharge,
+  } = req.body;
+
+  // Ensure only allowed fields are updated
+  const allowedFields = {
+    email,
+    phone,
+    name,
+    overview,
+    location,
+    sportsId: sports,
+    amenitiesId: amenities,
+    price,
+    additionalCharge,
+  };
+
+  const turfOwner = await Turf.findById(id).select("createdUserId");
+
+  if (turfOwner.equals(req.user._id)) {
+    throw new ApiError(403, "Only turf owners are allowed to perform updates");
+  }
+
+  // Update turf details except images, documents, and timings
+  const turf = await Turf.findByIdAndUpdate(
+    id,
+    { $set: allowedFields },
+    { new: true }
+  );
+
+  if (!turf) {
+    throw new ApiError(404, "Turf not found");
+  }
+
+  await sendNotification(
+    req.body.updatedUserId,
+    "Turf details updated successfully",
+    "Your request to update turf details has been successfully completed.",
+    "success"
+  );
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, turf, "Turf details updated successfully"));
+});
+
 //helpers
 const getTimings = async (timings, createdTurf) => {
   // Check if timings array is provided and not empty
@@ -377,4 +460,4 @@ const saveDocuments = async (files, documents, createdTurf) => {
   return await Document.insertMany(turfDocumentsData);
 };
 
-export { create, list, listForOwner, getOne };
+export { create, list, listForOwner, getOne, updateTurfDetails };
