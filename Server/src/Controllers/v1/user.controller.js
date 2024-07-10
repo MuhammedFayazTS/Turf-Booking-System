@@ -3,9 +3,14 @@ import User from "../../models/user.model.js";
 import { asyncHandler } from "../../utils/asyncHandler.js";
 import { ApiError } from "../../utils/ApiError.js";
 import { ApiResponse } from "../../utils/ApiResponse.js";
-import { sendAdminNotifications } from "../../utils/notification.helper.js";
+import {
+  sendAdminNotifications,
+  sendNotification,
+} from "../../utils/notification.helper.js";
 import { TypeConstants } from "../../constants.js";
-import { getPagination } from "../../utils/helper.js";
+import { getPagination, uploadFile } from "../../utils/helper.js";
+import bcrypt from "bcryptjs";
+import { deleteFromCloudinary } from "../../services/cloudinary.js";
 
 // list users
 const list = asyncHandler(async (req, res) => {
@@ -49,7 +54,7 @@ const getOne = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
   if (!id) {
-    throw new ApiError(400, "Invalid user id", "Invalid user id");
+    throw new ApiError(400, "Invalid user id");
   }
 
   const user = await User.findById(id).select("-password");
@@ -68,7 +73,7 @@ const getLoggedInUser = asyncHandler(async (req, res) => {
   const id = req.user._id;
 
   if (!id) {
-    throw new ApiError(400, "Invalid user id", "Invalid user id");
+    throw new ApiError(400, "Invalid user id");
   }
 
   const user = await User.findById(id).select("-password");
@@ -145,4 +150,100 @@ const changeUserRole = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, existedUser, "User role updated successfully"));
 });
 
-export { changeUserRole, list, getOne,getLoggedInUser };
+// change user password
+const changeUserPassword = asyncHandler(async (req, res) => {
+  const { oldPassword, newPassword, confirmPassword } = req.body;
+  const id = req.user?._id;
+
+  if (!oldPassword || !newPassword || !confirmPassword) {
+    throw new ApiError(400, "All fields are required");
+  }
+
+  if (newPassword !== confirmPassword) {
+    throw new ApiError(400, "Confirm password does not match");
+  }
+
+  const user = await User.findById(id);
+  const isPasswordCorrect = await user.isPasswordCorrect(oldPassword);
+  if (!isPasswordCorrect) {
+    throw new ApiError(400, "Invalid old password");
+  }
+
+  const isPasswordMatch = await bcrypt.compare(newPassword, user.password);
+  if (isPasswordMatch) {
+    throw new ApiError(400, "New password must different from old password");
+  }
+
+  user.password = newPassword;
+  await user.save({ validateBeforeSave: false });
+
+  sendNotification(
+    id,
+    "Password changed successfully",
+    "Account password changed successfully",
+    "info"
+  );
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, {}, "Password changed successfully"));
+});
+
+// UPDATE user details
+const updateUserDetails = asyncHandler(async (req, res) => {
+  const { email, username, phone } = req.body;
+
+  const user = await User.findByIdAndUpdate(
+    req.user._id,
+    {
+      $set: {
+        username,
+        email,
+        phone,
+      },
+    },
+    { new: true }
+  ).select("-password");
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, user, "User details updated successfully"));
+});
+
+//update user image
+const updateUserImage = asyncHandler(async (req, res) => {
+  const id = req.user._id;
+  const files = req.files;
+
+  if (!files || files.length === 0) {
+    throw new ApiError(400, "Image file is missing");
+  }
+  const uploadedImage = await uploadFile(files, "image");
+
+  if (!uploadedImage) {
+    throw new ApiError(400, "Error while uploading image");
+  }
+
+  const oldImage = await User.findById(id).select("image");
+  await deleteFromCloudinary(oldImage);
+
+  const user = await User.findByIdAndUpdate(
+    id,
+    { $set: { image: uploadedImage } },
+    { new: true }
+  ).select("-password -refreshToken");
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, user, "User image updated successfully"));
+});
+
+export {
+  changeUserRole,
+  list,
+  getOne,
+  getLoggedInUser,
+  changeUserPassword,
+  updateUserDetails,
+  updateUserImage,
+};
