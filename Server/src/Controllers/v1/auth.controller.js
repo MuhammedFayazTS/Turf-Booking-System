@@ -128,7 +128,14 @@ const signIn = asyncHandler(async (req, res) => {
   const { email, password, phone, username } = req.body;
 
   const user = await User.findOne({
-    $or: [{ email }, { phone }, { username }],
+    $and: [
+      {
+        $or: [{ deleted: false }, { deleted: { $exists: false } }],
+      },
+      {
+        $or: [{ email }, { phone }, { username }],
+      },
+    ],
   });
 
   if (!user) {
