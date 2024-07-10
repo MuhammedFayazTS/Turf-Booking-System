@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import aggregatePaginate from "mongoose-aggregate-paginate-v2";
 
 const { Schema, model } = mongoose;
 
@@ -103,6 +104,8 @@ const turfSchema = new Schema(
     timestamps: true,
   }
 );
+
+turfSchema.plugin(aggregatePaginate)
 
 const Turf = model("Turfs", turfSchema);
 

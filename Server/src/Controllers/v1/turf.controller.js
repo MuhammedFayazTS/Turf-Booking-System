@@ -167,13 +167,77 @@ const list = asyncHandler(async (req, res) => {
     }),
   };
 
-  // Retrieve the total count of matching documents
-  const totalCount = await Turf.countDocuments(searchQuery);
-
   const { limitNum, skip, pageNum } = getPagination(page, limit);
 
+  // Create the aggregation pipeline
+  const pipeline = [
+    {
+      $match: searchQuery,
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "createdUserId",
+        foreignField: "_id",
+        as: "ownerDeletedStatus",
+      },
+    },
+    {
+      $addFields: {
+        ownerDeletedStatus: {
+          $first: "$ownerDeletedStatus.deleted",
+        },
+      },
+    },
+    {
+      $match: {
+        ownerDeletedStatus: { $ne: true },
+      },
+    },
+    {
+      $skip: skip,
+    },
+    {
+      $limit: limitNum,
+    },
+  ];
+
+  // Retrieve the total count of matching documents
+  const totalCountPipeline = [
+    {
+      $match: searchQuery,
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "createdUserId",
+        foreignField: "_id",
+        as: "ownerDeletedStatus",
+      },
+    },
+    {
+      $addFields: {
+        ownerDeletedStatus: {
+          $first: "$ownerDeletedStatus.deleted",
+        },
+      },
+    },
+    {
+      $match: {
+        ownerDeletedStatus: { $ne: true },
+      },
+    },
+    {
+      $count: "totalCount",
+    },
+  ];
+
+  // Retrieve the total count of matching documents
+  const [totalCountResult] = await Turf.aggregate(totalCountPipeline);
+  const totalCount = totalCountResult ? totalCountResult.totalCount : 0;
+
   // Retrieve the paginated list of turfs
-  const turfs = await Turf.find(searchQuery).limit(limitNum).skip(skip);
+  const turfs = await Turf.aggregate(pipeline);
 
   if (!turfs || turfs.length === 0) {
     return res.status(404).json(new ApiResponse(404, {}, "No turfs found"));
