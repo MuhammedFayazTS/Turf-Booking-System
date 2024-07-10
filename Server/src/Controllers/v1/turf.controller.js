@@ -12,6 +12,7 @@ import {
 import { getPagination, uploadFiles } from "../../utils/helper.js";
 import Document from "../../models/document.model.js";
 import { TypeConstants } from "../../constants.js";
+import { deleteFromCloudinary } from "../../services/cloudinary.js";
 
 // turf schema
 const schema = Joi.object({
@@ -374,7 +375,7 @@ const updateTurfDetails = asyncHandler(async (req, res) => {
 
   const turfOwner = await Turf.findById(id).select("createdUserId");
 
-  if (turfOwner.equals(req.user._id)) {
+  if (!turfOwner.equals(req.user._id)) {
     throw new ApiError(403, "Only turf owners are allowed to perform updates");
   }
 
@@ -390,7 +391,7 @@ const updateTurfDetails = asyncHandler(async (req, res) => {
   }
 
   await sendNotification(
-    req.body.updatedUserId,
+    turf.createdUserId,
     "Turf details updated successfully",
     "Your request to update turf details has been successfully completed.",
     "success"
@@ -399,6 +400,54 @@ const updateTurfDetails = asyncHandler(async (req, res) => {
   return res
     .status(200)
     .json(new ApiResponse(200, turf, "Turf details updated successfully"));
+});
+
+const updateTurfImages = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { images: existingImages } = req.body; //existing images from frontend
+  const files = req.files; //new files from frontend
+  let uploadedImages = [];
+  const { createdUserId: turfOwner, images: oldImages } = await Turf.findById(
+    id
+  ).select("createdUserId images");
+
+  if (files && files.length > 0) {
+    if (!turfOwner.equals(req.user._id)) {
+      throw new ApiError(
+        403,
+        "Only turf owners are allowed to perform updates"
+      );
+    }
+
+    // Process multiple images
+    uploadedImages = await uploadFiles(files, "images");
+
+    if (uploadedImages.includes(null)) {
+      throw new ApiError(400, "Failed to upload images");
+    }
+  }
+
+  const updatedTurf = await Turf.findByIdAndUpdate(
+    id,
+    {
+      images: [...existingImages, ...uploadedImages],
+    },
+    { new: true }
+  );
+
+  const imagesToBeDeleted = oldImages.filter(
+    (image) => !existingImages.includes(image)
+  );
+
+  for (let image of imagesToBeDeleted) {
+    await deleteFromCloudinary(image);
+  }
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, updatedTurf, "Turf images updated successfully")
+    );
 });
 
 //helpers
@@ -460,4 +509,11 @@ const saveDocuments = async (files, documents, createdTurf) => {
   return await Document.insertMany(turfDocumentsData);
 };
 
-export { create, list, listForOwner, getOne, updateTurfDetails };
+export {
+  create,
+  list,
+  listForOwner,
+  getOne,
+  updateTurfDetails,
+  updateTurfImages,
+};

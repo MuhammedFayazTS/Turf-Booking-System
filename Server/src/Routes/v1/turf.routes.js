@@ -7,6 +7,7 @@ import {
   updateTurfDetails,
   turfInputValidation,
   validateUpdateTurfInput,
+  updateTurfImages,
 } from "../../Controllers/v1/turf.controller.js";
 import { attachUserId } from "../../middlewares/attachuserid.middleware.js";
 import { verifyJWT } from "../../middlewares/auth.middleware.js";
@@ -32,6 +33,15 @@ router.route("/list").get(verifyJWT, list);
 router.route("/list-for-owner").get(verifyJWT, listForOwner);
 
 router.route("/:id").get(verifyJWT, getOne);
+
+router
+  .route("/change-images/:id")
+  .put(
+    verifyJWT,
+    authorizeRole(["owner", "admin"]),
+    upload.any(),
+    updateTurfImages
+  );
 
 router
   .route("/:id")
