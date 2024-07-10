@@ -14,10 +14,15 @@ import { deleteFromCloudinary } from "../../services/cloudinary.js";
 
 // list users
 const list = asyncHandler(async (req, res) => {
-  const { limit = 10, page = 1, search = "" } = req.query;
+  const { limit = 10, page = 1, search = "", role = "" } = req.query;
 
   const searchQuery = {
     _id: { $ne: req.user._id },
+    $and: [
+      { role: { $ne: "admin" } },
+      { role: { $regex: role, $options: "i" } },
+    ],
+    $or: [{ deleted: false }, { deleted: { $exists: false } }],
     username: { $regex: search, $options: "i" },
   };
 
@@ -238,6 +243,35 @@ const updateUserImage = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, user, "User image updated successfully"));
 });
 
+// delete user
+const destroy = asyncHandler(async (req, res) => {
+  const id = req.user._id;
+
+  // Check if the user exists and is not already deleted
+  const user = await User.findOne({ _id: id, deleted: false });
+
+  if (!user) {
+    return res
+      .status(404)
+      .json(new ApiResponse(404, null, "User not found or already deleted"));
+  }
+
+  // Perform the soft delete
+  const deleted = await User.delete({ _id: id });
+
+  const options = {
+    httpOnly: true,
+    secure: true,
+    sameSite: "None",
+  };
+
+  res
+    .status(200)
+    .clearCookie("accessToken", options)
+    .clearCookie("refreshToken", options)
+    .json(new ApiResponse(200, deleted, "User deleted successfully"));
+});
+
 export {
   changeUserRole,
   list,
@@ -246,4 +280,5 @@ export {
   changeUserPassword,
   updateUserDetails,
   updateUserImage,
+  destroy,
 };

@@ -13,6 +13,7 @@ import {
   changeUserPassword,
   updateUserDetails,
   updateUserImage,
+  destroy
 } from "../../Controllers/v1/user.controller.js";
 import { upload } from "../../middlewares/multer.middleware.js";
 
@@ -24,5 +25,6 @@ router.route("/change-password").put(verifyJWT, changeUserPassword);
 router.route("/change-image").put(verifyJWT, upload.any(), updateUserImage);
 router.route("/").put(verifyJWT, updateUserDetails);
 router.route("/:id").get(verifyJWT, getOne);
+router.route("/").delete(verifyJWT,attachUserId, destroy);
 
 export default router;

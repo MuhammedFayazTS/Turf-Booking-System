@@ -1,4 +1,5 @@
 import mongoose, { Schema, model } from "mongoose";
+import MongooseDelete from "mongoose-delete";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
@@ -93,6 +94,8 @@ userSchema.methods.generateRefreshToken = async function () {
     }
   );
 };
+
+userSchema.plugin(MongooseDelete, { deletedBy: true, deletedAt: true });
 
 const User = model("User", userSchema);
 
