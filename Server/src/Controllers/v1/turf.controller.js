@@ -133,7 +133,11 @@ const create = asyncHandler(async (req, res, next) => {
   }
 
   // save documents
-  const createdDocuments = await saveDocuments(files, documents, createdTurf);
+  const createdDocuments = await saveDocuments(
+    files,
+    documents,
+    createdTurf._id
+  );
   createdTurf.documentsId = createdDocuments.map((document) => document._id);
   await createdTurf.save();
 
@@ -450,6 +454,56 @@ const updateTurfImages = asyncHandler(async (req, res) => {
     );
 });
 
+const updateTurfDocuments = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { documents, existingDocuments = [] } = req.body;
+  const files = req.files;
+  let uploadedDocuments = [];
+
+  const { createdUserId: turfOwner, documentsId: oldDocuments } =
+    await Turf.findById(id)
+      .select("createdUserId documents")
+      .populate("documentsId");
+
+  if (files && files.length > 0) {
+    if (!turfOwner.equals(req.user._id)) {
+      throw new ApiError(
+        403,
+        "Only turf owners are allowed to perform updates"
+      );
+    }
+
+    const uploadedDocumentsData = await saveDocuments(files, documents, id);
+    uploadedDocuments = uploadedDocumentsData.map((document) => document._id);
+
+    if (uploadedDocuments.includes(null)) {
+      throw new ApiError(400, "Failed to upload documents");
+    }
+  }
+
+  const updatedTurf = await Turf.findByIdAndUpdate(
+    id,
+    {
+      documentsId: [...existingDocuments, ...uploadedDocuments],
+    },
+    { new: true }
+  );
+
+  const documentsToBeDeleted = oldDocuments.filter(
+    (document) => !existingDocuments.includes(document)
+  );
+
+  for (let document of documentsToBeDeleted) {
+    await deleteFromCloudinary(document.file);
+  }
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, updatedTurf, "Turf documents updated successfully")
+    );
+});
+
 //helpers
 const getTimings = async (timings, createdTurf) => {
   // Check if timings array is provided and not empty
@@ -476,10 +530,9 @@ const getTimings = async (timings, createdTurf) => {
   return await Timing.insertMany(turfTimingsData);
 };
 
-const saveDocuments = async (files, documents, createdTurf) => {
+const saveDocuments = async (files, documents, turfId) => {
   // Check if documents array is provided and not empty
   if (!documents || !Array.isArray(documents) || documents.length === 0) {
-    await Turf.findByIdAndDelete(createdTurf._id);
     throw new ApiError(400, "Documents must not be empty");
   }
 
@@ -487,7 +540,6 @@ const saveDocuments = async (files, documents, createdTurf) => {
   const uploadedDocuments = await uploadFiles(files, "documentFiles");
 
   if (uploadedDocuments.includes(null)) {
-    await Turf.findByIdAndDelete(createdTurf._id);
     throw new ApiError(400, "Failed to upload documents");
   }
   // Check if uploaded documents array is  not empty
@@ -496,12 +548,11 @@ const saveDocuments = async (files, documents, createdTurf) => {
     !Array.isArray(uploadedDocuments) ||
     uploadedDocuments.length === 0
   ) {
-    await Turf.findByIdAndDelete(createdTurf._id);
     throw new ApiError(400, "Documents must not be empty");
   }
 
   const turfDocumentsData = documents.map((document, index) => ({
-    turfId: createdTurf._id,
+    turfId: turfId,
     name: document.name,
     file: uploadedDocuments[index],
   }));
@@ -516,4 +567,5 @@ export {
   getOne,
   updateTurfDetails,
   updateTurfImages,
+  updateTurfDocuments,
 };

@@ -8,6 +8,7 @@ import {
   turfInputValidation,
   validateUpdateTurfInput,
   updateTurfImages,
+  updateTurfDocuments,
 } from "../../Controllers/v1/turf.controller.js";
 import { attachUserId } from "../../middlewares/attachuserid.middleware.js";
 import { verifyJWT } from "../../middlewares/auth.middleware.js";
@@ -41,6 +42,15 @@ router
     authorizeRole(["owner", "admin"]),
     upload.any(),
     updateTurfImages
+  );
+
+router
+  .route("/change-documents/:id")
+  .put(
+    verifyJWT,
+    authorizeRole(["owner", "admin"]),
+    upload.any(),
+    updateTurfDocuments
   );
 
 router
