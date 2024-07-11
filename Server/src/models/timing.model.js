@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import aggregatePaginate from "mongoose-aggregate-paginate-v2";
 
 const { Schema, model } = mongoose;
 
@@ -32,6 +33,8 @@ const timingSchema = new Schema(
     timestamps: true,
   }
 );
+
+timingSchema.plugin(aggregatePaginate)
 
 const Timing = model("Timing", timingSchema);
 
