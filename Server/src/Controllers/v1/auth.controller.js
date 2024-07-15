@@ -12,9 +12,14 @@ import { uploadFile } from "../../utils/helper.js";
 const schema = Joi.object({
   email: Joi.string().email().required(),
   password: Joi.string().min(6).max(30).required(),
+  confirmPassword: Joi.string().valid(Joi.ref("password")).optional().messages({
+    "any.only": "Confirm password must match password",
+    "string.empty": "Confirm password is required",
+  }),
   phone: Joi.string().min(8).max(15).required(),
   username: Joi.string().min(3).max(12).required(),
   role: Joi.string().optional(),
+  image: Joi.optional(),
 });
 
 const schemaForSignIn = schema.fork(
@@ -87,10 +92,14 @@ const signUp = asyncHandler(async (req, res) => {
     );
   }
 
-  const files = req.files;
-  const uploadedImage = await uploadFile(files, "image");
+  const imageFile = req.files[0]?.fieldname;
+  let uploadedImage;
+  if (imageFile) {
+    const files = req.files;
+    uploadedImage = await uploadFile(files, "image");
+  }
 
-  if (!uploadedImage) {
+  if (imageFile && !uploadedImage) {
     throw new ApiError(500, "Error in uploading file");
   }
 
@@ -115,13 +124,7 @@ const signUp = asyncHandler(async (req, res) => {
 
   return res
     .status(201)
-    .json(
-      new ApiResponse(
-        201,
-        createdUser,
-        "User signed up successfully. Account verification email has been sent to your email address."
-      )
-    );
+    .json(new ApiResponse(201, createdUser, "User signed up successfully."));
 });
 
 const signIn = asyncHandler(async (req, res) => {
