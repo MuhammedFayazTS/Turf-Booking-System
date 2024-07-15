@@ -5,8 +5,11 @@ import Lottie from 'react-lottie-player';
 import Routes from './Routes/Index';
 import { ScrollToTop } from 'react-simple-scroll-up';
 import { ArrowUpIcon } from '@heroicons/react/24/solid';
+import axios from 'axios';
 
 function App() {
+  axios.defaults.baseURL = process.env.REACT_APP_API;
+  axios.defaults.withCredentials = true;
   const { loading } = useSelector((state) => state.alerts);
 
   return (
