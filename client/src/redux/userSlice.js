@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axiosInstance from '../Utils/axiosInstance';
+import axios from 'axios';
 
 const initialState = {
   loading: false,
@@ -10,7 +10,7 @@ const initialState = {
 
 const signUp = createAsyncThunk('user/signUp', async (userData, { rejectWithValue }) => {
   try {
-    const response = await axiosInstance.post('/auth/sign-up', userData, {
+    const response = await axios.post('/auth/sign-up', userData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },

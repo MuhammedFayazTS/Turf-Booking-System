@@ -52,19 +52,20 @@ function SignUp() {
       .oneOf([Yup.ref('password'), null], 'Password must match')
       .required('Confirm password is required'),
     image: Yup.mixed()
-      .optional('Image is optional')
       .test('fileSize', 'File size is too large', (value) => {
-        return value && value.size <= 10485760; // 10 MB
+        if (!value) return true; // If no image, skip size validation
+        return value.size <= 10485760; // 10 MB
       })
       .test('fileType', 'Unsupported file format', (value) => {
-        return value && ['image/jpeg', 'image/png', 'image/gif', 'image/svg+xml'].includes(value.type);
+        if (!value) return true; // If no image, skip type validation
+        return ['image/jpeg', 'image/png', 'image/gif', 'image/svg+xml'].includes(value.type);
       }),
   });
 
   const handleSignUp = async (values) => {
     const formData = new FormData();
     Object.keys(values).forEach((key) => {
-      formData.append(key, values[key]);
+      values[key] !== undefined && formData.append(key, values[key]);
     });
     const actionResult = await dispatch(signUp(formData));
 
@@ -121,6 +122,7 @@ function SignUp() {
               password: '',
               confirmPassword: '',
               role: 'user',
+              image: undefined,
             }}
             validationSchema={validate}
             onSubmit={handleSignUp}
