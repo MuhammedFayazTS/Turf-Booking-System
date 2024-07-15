@@ -11,7 +11,7 @@ import {
 } from '@chakra-ui/react';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 
-function TextField({ label, noLabel, show, setShow, showProtectedText, placeholder, ...props }) {
+function TextField({ label, noLabel, show, setShow, showProtectedText, placeholder, fontSize = 'medium', ...props }) {
   const [field, meta] = useField(props);
 
   const handleClick = () => setShow(!show);
@@ -23,7 +23,8 @@ function TextField({ label, noLabel, show, setShow, showProtectedText, placehold
         <Input
           variant="filled"
           size="lg"
-          fontSize={'medium'}
+          fontSize={fontSize}
+          autoComplete="off"
           {...field}
           {...props}
           value={field.value || ''}
