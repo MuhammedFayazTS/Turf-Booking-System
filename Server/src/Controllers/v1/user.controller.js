@@ -81,7 +81,7 @@ const getLoggedInUser = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Invalid user id");
   }
 
-  const user = await User.findById(id).select("-password");
+  const user = await User.findById(id).select("-password -refreshToken");
 
   if (!user) {
     return res.status(404).json(new ApiResponse(404, {}, "User not found"));
