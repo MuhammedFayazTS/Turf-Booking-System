@@ -36,6 +36,22 @@ const signIn = createAsyncThunk('auth/signIn', async (userData, { rejectWithValu
   }
 });
 
+const loadUser = createAsyncThunk('auth/loadUser', async (_, { rejectWithValue, getState }) => {
+  const state = getState();
+  const token = state.auth.token;
+
+  try {
+    const response = await axios.get('/user', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    return rejectWithValue(error.response.data);
+  }
+});
+
 const authSlice = createSlice({
   name: 'auth',
   initialState,
@@ -59,7 +75,7 @@ const authSlice = createSlice({
     });
     builder.addCase(signIn.fulfilled, (state, action) => {
       state.loading = false;
-      state.user = action.payload.user;
+      state.user = action.payload.data;
       state.token = action.payload.token;
       state.isAuthenticated = true;
       state.error = '';
@@ -71,8 +87,23 @@ const authSlice = createSlice({
       state.isAuthenticated = false;
       state.error = action.payload ? action.payload.message : action.error.message;
     });
+    builder.addCase(loadUser.pending, (state) => {
+      state.loading = true;
+    });
+    builder.addCase(loadUser.fulfilled, (state, action) => {
+      state.loading = false;
+      state.user = action.payload.data;
+      state.isAuthenticated = true;
+      state.error = '';
+    });
+    builder.addCase(loadUser.rejected, (state, action) => {
+      state.loading = false;
+      state.user = null;
+      state.isAuthenticated = false;
+      state.error = action.payload ? action.payload.message : action.error.message;
+    });
   },
 });
 
-export { signUp, signIn };
+export { signUp, signIn, loadUser };
 export default authSlice.reducer;

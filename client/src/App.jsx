@@ -1,16 +1,26 @@
 import { Toaster } from 'react-hot-toast';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import loader from './Assets/lottie/loader.json';
 import Lottie from 'react-lottie-player';
 import Routes from './Routes/Index';
 import { ScrollToTop } from 'react-simple-scroll-up';
 import { ArrowUpIcon } from '@heroicons/react/24/solid';
 import axios from 'axios';
+import { useEffect } from 'react';
+import { loadUser } from './redux/slices/auth.slice';
 
 function App() {
   axios.defaults.baseURL = process.env.REACT_APP_API;
   axios.defaults.withCredentials = true;
+  const dispatch = useDispatch();
   const { loading } = useSelector((state) => state.alerts);
+  const { user } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    if (!user) {
+      dispatch(loadUser());
+    }
+  }, [dispatch, user]);
 
   return (
     <>
