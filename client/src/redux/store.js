@@ -1,16 +1,12 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { combineReducers } from 'redux';
 import alertReducer from './alertSlice';
-import userReducer from './userSlice';
-import bookingReducer from './bookingSlice';
-import adminReducer from './adminSlice';
+import authReducer from './slices/auth.slice';
 import { createLogger } from 'redux-logger';
 
 const rootReducer = combineReducers({
-  user: userReducer,
+  auth: authReducer,
   alerts: alertReducer,
-//   booking: bookingReducer,
-//   admin: adminReducer,
 });
 
 const logger = createLogger();
