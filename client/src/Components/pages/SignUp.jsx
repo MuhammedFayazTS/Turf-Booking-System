@@ -4,20 +4,19 @@ import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
 import TextField from '../Forms/Formik Components/TextField';
 import { Link, useNavigate } from 'react-router-dom';
-import toast from 'react-hot-toast';
 import { ArrowLongRightIcon } from '@heroicons/react/24/outline';
 import { CheckBadgeIcon } from '@heroicons/react/24/solid';
 import Stepper from '../content/Stepper';
 import FileUpload from '../core/FileUpload';
 import { useDispatch, useSelector } from 'react-redux';
-import { signUp } from '../../redux/userSlice';
+import { signUp } from '../../redux/slices/auth.slice';
 
 function SignUp() {
   const [showPass, setShowPass] = useState(false);
   const [showConfirmPass, setShowConfirmPass] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { loading } = useSelector((state) => state.user);
+  const { loading } = useSelector((state) => state.auth);
 
   const steps = [
     { title: 'First', description: 'User info' },

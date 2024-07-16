@@ -7,10 +7,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { ArrowLongRightIcon, CheckBadgeIcon } from '@heroicons/react/24/solid';
 import TextField from '../Forms/Formik Components/TextField';
-import { signIn } from '../../redux/userSlice';
+import { signIn } from '../../redux/slices/auth.slice';
 
 function SignIn() {
-  const { loading } = useSelector((state) => state.user);
+  const { loading } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [showPass, setShowPass] = useState(false);
