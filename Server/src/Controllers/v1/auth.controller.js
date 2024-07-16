@@ -79,17 +79,12 @@ const signUp = asyncHandler(async (req, res) => {
   if (existedUser) {
     throw new ApiError(
       409,
-      "User with email or username or phone number already exists",
       "User with email or username or phone number already exists"
     );
   }
 
   if (role === "admin") {
-    throw new ApiError(
-      403,
-      "Only admin can assign admin role to users",
-      "Only admin can assign admin role to users"
-    );
+    throw new ApiError(403, "Only admin can assign admin role to users");
   }
 
   const imageFile = req.files[0]?.fieldname;
@@ -177,7 +172,7 @@ const signIn = asyncHandler(async (req, res) => {
         // accessToken,
         // refreshToken,
       },
-      "User signed in"
+      "User signed in successfully"
     )
   );
 });
