@@ -46,17 +46,11 @@ function SignIn() {
     const actionResult = await dispatch(signIn(newValues));
 
     if (signIn.fulfilled.match(actionResult)) {
-      // Navigate on success
-      toast.success('User signed in successfully');
       setTimeout(() => {
         navigate('/');
-      }, 2000);
-    } else {
-      // Handle errors
-      toast.error(actionResult.payload.message || actionResult.payload.errors || 'Sign in failed!');
+      }, 1000);
     }
   };
-
   return (
     <>
       <div className="grid md:grid-cols-2">
@@ -93,7 +87,7 @@ function SignIn() {
           <p className="self-start mt-2 text-base text-gray-600">
             Don't have an account?{' '}
             <Link
-              to="/register"
+              to="/sign-up"
               title=""
               className="font-medium text-black transition-all duration-200 hover:underline "
             >
@@ -111,12 +105,7 @@ function SignIn() {
           >
             {(formik) => (
               <Form className="flex flex-col space-y-4 w-full mt-6">
-                <TextField
-                  label="Email or Phone or Username"
-                  placeholder="Enter email, phone, or username"
-                  name="identifier"
-                  type="text"
-                />
+                <TextField label="Email or Phone" placeholder="Enter email or phone" name="identifier" type="text" />
                 <TextField
                   label="Password"
                   name="password"

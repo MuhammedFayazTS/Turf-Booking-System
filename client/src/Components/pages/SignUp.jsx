@@ -4,7 +4,6 @@ import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
 import TextField from '../Forms/Formik Components/TextField';
 import { Link, useNavigate } from 'react-router-dom';
-import { registerAPI } from '../../Services/allAPIs';
 import toast from 'react-hot-toast';
 import { ArrowLongRightIcon } from '@heroicons/react/24/outline';
 import { CheckBadgeIcon } from '@heroicons/react/24/solid';
@@ -70,14 +69,9 @@ function SignUp() {
     const actionResult = await dispatch(signUp(formData));
 
     if (signUp.fulfilled.match(actionResult)) {
-      // Navigate on success
-      toast.success('Sign up successful! Redirecting to login...');
       setTimeout(() => {
         navigate('/sign-in');
-      }, 2000);
-    } else {
-      // Handle errors
-      toast.error(actionResult.payload.message || 'Sign up failed!');
+      }, 1000);
     }
   };
 
