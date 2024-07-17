@@ -1,17 +1,19 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Button } from '@chakra-ui/react';
 import { UserIcon } from '@heroicons/react/24/outline';
 import NavbarLinks from './NavbarLinks';
 import UserMenu from './UserMenu';
 import MobileMenuToggle from './MobileMenuToggle';
+import { signOut } from '../../../redux/slices/auth.slice';
 // logo
 const Logo = '/assets/logo/logo-no-bg.png';
 
 const Header = ({ pos }) => {
   const { isAuthenticated, user } = useSelector((state) => state.auth);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [open, setOpen] = useState(false);
   const [isTransparent, setIsTransparent] = useState(false);
 
@@ -24,8 +26,14 @@ const Header = ({ pos }) => {
   };
   window.addEventListener('scroll', changeColor);
 
-  const handleSignOut = () => {
-    //TODO: signout action call
+  const handleSignOut = async () => {
+    const actionResult = await dispatch(signOut());
+
+    if (signOut.fulfilled.match(actionResult)) {
+      setTimeout(() => {
+        navigate('/sign-in');
+      }, 1000);
+    }
   };
 
   return (

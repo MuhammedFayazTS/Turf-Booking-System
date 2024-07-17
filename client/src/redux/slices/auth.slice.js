@@ -69,6 +69,16 @@ const refreshToken = createAsyncThunk('auth/refreshToken', async ({ rejectWithVa
   }
 });
 
+const signOut = createAsyncThunk('auth/signOut', async (_, { rejectWithValue }) => {
+  try {
+    const response = await axios.post('/auth/sign-out');
+    localStorage.removeItem('tokenExpiresAt');
+    return response.data;
+  } catch (error) {
+    return rejectWithValue(error.response.data);
+  }
+});
+
 const authSlice = createSlice({
   name: 'auth',
   initialState,
@@ -135,8 +145,22 @@ const authSlice = createSlice({
       state.error = action.payload;
       state.isAuthenticated = false;
     });
+    builder.addCase(signOut.pending, (state) => {
+      state.loading = true;
+    });
+    builder.addCase(signOut.fulfilled, (state) => {
+      state.loading = false;
+      state.user = null;
+      state.token = null;
+      state.isAuthenticated = false;
+      state.error = '';
+    });
+    builder.addCase(signOut.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload ? action.payload.message : action.error.message;
+    });
   },
 });
 
-export { signUp, signIn, loadUser, refreshToken };
+export { signUp, signIn, loadUser, refreshToken, signOut };
 export default authSlice.reducer;
