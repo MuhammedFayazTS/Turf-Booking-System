@@ -7,7 +7,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLongRightIcon } from '@heroicons/react/24/outline';
 import { CheckBadgeIcon } from '@heroicons/react/24/solid';
 import Stepper from '../content/Stepper';
-import FileUpload from '../core/FileUpload';
+import FileUpload from '../core/FileUpload/FileUpload';
 import { useDispatch, useSelector } from 'react-redux';
 import { signUp } from '../../redux/slices/auth.slice';
 
