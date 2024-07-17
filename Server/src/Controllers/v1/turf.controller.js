@@ -328,6 +328,64 @@ const listForOwner = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, response, "Turfs listed successfully"));
 });
 
+const listTurfsForHome = asyncHandler(async (req, res) => {
+  const { limit = 4, status = "approved", location = "" } = req.query;
+
+  const limitNum = parseInt(limit, 10);
+
+  const filter = {
+    status,
+  };
+
+  // If a location is provided, add it to the filter (Assuming you have a field for location in your Turf model)
+  if (location) {
+    filter.location = location;
+  }
+
+  const pipeline = [
+    {
+      $match: filter,
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "createdUserId",
+        foreignField: "_id",
+        as: "ownerInfo",
+      },
+    },
+    {
+      $addFields: {
+        ownerDeletedStatus: {
+          $first: "$ownerInfo.deleted",
+        },
+      },
+    },
+    {
+      $match: {
+        ownerDeletedStatus: { $ne: true },
+      },
+    },
+    {
+      $limit: limitNum,
+    },
+  ];
+
+  const turfs = await Turf.aggregate(pipeline);
+
+  if (!turfs || turfs.length === 0) {
+    return res.status(404).json(new ApiResponse(404, {}, "No turfs found"));
+  }
+
+  const response = {
+    turfs,
+  };
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, response, "Turf listed successfully"));
+});
+
 const getOne = asyncHandler(async (req, res) => {
   const { id } = req.params;
   if (!id) {
@@ -568,4 +626,5 @@ export {
   updateTurfDetails,
   updateTurfImages,
   updateTurfDocuments,
+  listTurfsForHome,
 };
