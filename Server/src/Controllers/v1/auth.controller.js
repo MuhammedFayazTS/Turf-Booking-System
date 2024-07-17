@@ -6,7 +6,7 @@ import User from "../../models/user.model.js";
 import { asyncHandler } from "../../utils/asyncHandler.js";
 import { ApiResponse } from "../../utils/ApiResponse.js";
 import { ApiError } from "../../utils/ApiError.js";
-import { uploadFile } from "../../utils/helper.js";
+import { getTokenExpiry, uploadFile } from "../../utils/helper.js";
 
 // user schema for validation
 const schema = Joi.object({
@@ -154,6 +154,8 @@ const signIn = asyncHandler(async (req, res) => {
     .select("-password -refreshToken")
     .lean();
 
+  const tokenExpiresAt = getTokenExpiry(accessToken);
+
   const options = {
     httpOnly: true,
     secure: true,
@@ -168,6 +170,7 @@ const signIn = asyncHandler(async (req, res) => {
       200,
       {
         user: loggedInUser,
+        tokenExpiresAt,
         // Uncomment below lines if you want to send tokens in the response body for mobile apps or local storage
         // accessToken,
         // refreshToken,
@@ -236,11 +239,13 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     const { accessToken, newRefreshToken: refreshToken } =
       await generateAccessAndRefreshToken(user._id);
 
+    const tokenExpiresAt = getTokenExpiry(accessToken);
+
     return res
       .status(200)
       .cookie("accessToken", accessToken, options)
       .cookie("refreshToken", refreshToken, options)
-      .json(new ApiResponse(200, {}, "Access Token refreshed"));
+      .json(new ApiResponse(200, { tokenExpiresAt }, "Access Token refreshed"));
   } catch (error) {
     throw new ApiError(401, error?.message || "Invalid refresh token");
   }
