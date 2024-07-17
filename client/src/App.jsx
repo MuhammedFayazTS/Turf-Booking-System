@@ -1,23 +1,22 @@
 import { Toaster } from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
-import loader from './Assets/lottie/loader.json';
-import Lottie from 'react-lottie-player';
 import Routes from './Routes/Index';
 import { ScrollToTop } from 'react-simple-scroll-up';
 import { ArrowUpIcon } from '@heroicons/react/24/solid';
 import axios from 'axios';
 import { useEffect } from 'react';
 import { loadUser } from './redux/slices/auth.slice';
+import Loader from './Components/loader/Loader';
 
 function App() {
   axios.defaults.baseURL = process.env.REACT_APP_API;
   axios.defaults.withCredentials = true;
   const dispatch = useDispatch();
   const { loading } = useSelector((state) => state.alerts);
-  const { user } = useSelector((state) => state.auth);
+  const { token, loading: userLoading, user, isAuthenticated } = useSelector((state) => state.auth);
 
   useEffect(() => {
-    if (!user) {
+    if (!user && !isAuthenticated) {
       dispatch(loadUser());
     }
   }, [dispatch, user]);
@@ -26,14 +25,7 @@ function App() {
     <>
       <Toaster position="top-center" reverseOrder={false} />
 
-      {loading && (
-        <div
-          className="w-full h-screen flex justify-center items-center fixed top-0 backdrop-blur-[2px] left-0 z-50"
-          style={{ background: 'rgba(0,0,0,0.7)' }}
-        >
-          <Lottie loop animationData={loader} play style={{ width: 150, height: 150 }} />
-        </div>
-      )}
+      {loading && <Loader />}
 
       <ScrollToTop
         className="z-20"

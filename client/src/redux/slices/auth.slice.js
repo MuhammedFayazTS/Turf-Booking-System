@@ -52,6 +52,23 @@ const loadUser = createAsyncThunk('auth/loadUser', async (_, { rejectWithValue, 
   }
 });
 
+const refreshToken = createAsyncThunk('auth/refreshToken', async ({ rejectWithValue, getState }) => {
+  try {
+    const state = getState();
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${state.auth.token}`,
+      },
+    };
+    const response = await axios.post('/auth/refresh-token', {}, config);
+    localStorage.setItem('tokenExpiresAt', response.data.tokenExpiresAt);
+    return response.data;
+  } catch (error) {
+    return rejectWithValue(error.response.data);
+  }
+});
+
 const authSlice = createSlice({
   name: 'auth',
   initialState,
@@ -79,6 +96,7 @@ const authSlice = createSlice({
       state.token = action.payload.token;
       state.isAuthenticated = true;
       state.error = '';
+      localStorage.setItem('tokenExpiresAt', action.payload.data.tokenExpiresAt);
     });
     builder.addCase(signIn.rejected, (state, action) => {
       state.loading = false;
@@ -92,7 +110,7 @@ const authSlice = createSlice({
     });
     builder.addCase(loadUser.fulfilled, (state, action) => {
       state.loading = false;
-      state.user = action.payload.data;
+      state.user = action.payload?.data;
       state.isAuthenticated = true;
       state.error = '';
     });
@@ -102,8 +120,23 @@ const authSlice = createSlice({
       state.isAuthenticated = false;
       state.error = action.payload ? action.payload.message : action.error.message;
     });
+    builder.addCase(refreshToken.pending, (state) => {
+      state.loading = true;
+    });
+    builder.addCase(refreshToken.fulfilled, (state, action) => {
+      state.loading = false;
+      state.token = action.payload.token;
+      state.isAuthenticated = true;
+      state.error = '';
+      localStorage.setItem('tokenExpiresAt', action.payload.tokenExpiresAt);
+    });
+    builder.addCase(refreshToken.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+      state.isAuthenticated = false;
+    });
   },
 });
 
-export { signUp, signIn, loadUser };
+export { signUp, signIn, loadUser, refreshToken };
 export default authSlice.reducer;
