@@ -46,7 +46,7 @@ export const LocationPopover = () => {
   };
 
   const handleSetAllLocation = () => {
-    dispatch(setLocation({ name: 'All', latitude: '', longitude: '' }));
+    dispatch(setLocation({ name: 'all', latitude: '', longitude: '' }));
     handleClose();
   };
 

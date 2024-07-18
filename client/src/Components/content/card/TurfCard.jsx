@@ -5,20 +5,14 @@ import { CalendarDaysIcon } from '@heroicons/react/24/outline';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import DisplayStarRating from '../../Reviews & Rating/DisplayStarRating';
-import { useSelector } from 'react-redux';
 
 const defaultImage = 'https://placehold.co/800@3x.png';
 
 function TurfCard({ data }) {
   const navigate = useNavigate();
-  const { isAuthenticated } = useSelector((state) => state.auth);
 
   const handleBooking = () => {
-    if (isAuthenticated) {
-      // TODO: handle booking errors
-      return;
-    }
-    navigate(`/venue/${data._id}`);
+    navigate(`/turf/${data._id}`);
   };
 
   return (

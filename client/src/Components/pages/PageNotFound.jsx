@@ -1,9 +1,11 @@
 import React from 'react';
 import Header from '../core/Header/Header';
 import { ArrowLongLeftIcon } from '@heroicons/react/24/solid';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 function PageNotFound() {
+  const navigate = useNavigate();
+
   return (
     <div className="mx-auto w-full max-w-7xl px-2 md:px-4">
       <Header />
@@ -21,13 +23,13 @@ function PageNotFound() {
               Sorry, the page you are looking for doesn&apos;t exist or has been moved.
             </p>
             <div className="mt-6 flex items-center space-x-3">
-              <Link
-                to={'/'}
+              <button
+                onClick={() => navigate(-1)}
                 className="inline-flex items-center rounded-md border border-black px-3 py-2 text-sm font-semibold text-black shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
               >
                 <ArrowLongLeftIcon size={16} className="mr-2 w-5 h-5" />
                 Go back
-              </Link>
+              </button>
               <Link
                 to="/contact"
                 className="rounded-md bg-black px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-black/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
