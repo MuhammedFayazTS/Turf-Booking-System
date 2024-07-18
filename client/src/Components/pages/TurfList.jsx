@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Grid, GridItem } from '@chakra-ui/react';
 import Carousel from '../Swiper/Carousel';
@@ -13,10 +13,11 @@ import { setLocation } from '../../redux/slices/auth.slice';
 import { listTurfs } from '../../redux/slices/turf.slice';
 import Breadcrumbs from '../content/breadcrumbs/Breadcrumbs';
 import TurfListHeader from '../content/headers/TurfListHeader';
-import Loader from '../loader/Loader';
 import Pagination from '../content/pagination/Pagination';
+import LoadingTurfCard from '../content/card/LoadingTurfCard';
+import LoadingTurfCardHorizontal from '../content/card/LoadingTurfCardHorizontal';
+import TurfListFallback from '../content/fallback/TurfListFallback';
 
-// TODO: fetch banner image from db
 const imageList = [
   {
     src: 'https://blog.playo.co/wp-content/uploads/2017/10/football-grounds-in-dubai.jpg',
@@ -38,15 +39,18 @@ const TurfList = () => {
   const navigate = useNavigate();
   const { loading, turfs } = useSelector((state) => state.turf);
   const { location } = useSelector((state) => state.auth);
-  const [sort, setSort] = useState('price,asc');
-  const [search, setSearch] = useState('');
-  const [sports, setSports] = useState([]);
-  const [priceRange, setPriceRange] = useState([800, 2000]);
-  const [selectedAmenities, setSelectedAmenities] = useState([]);
-  const [filter, setFilter] = useState(false);
   const [gridListing, setGridListing] = useState(true);
   const [filterApplied, setFilterApplied] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+
+  const [filterState, setFilterState] = useState({
+    search: '',
+    sort: '',
+    sports: [],
+    selectedAmenities: [],
+    priceRange: [800, 6000],
+    location: location?.name,
+  });
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -54,41 +58,33 @@ const TurfList = () => {
   };
 
   const handleFilterChange = () => {
-    // TODO: Implement your logic to apply filters
     setFilterApplied(true); // Example logic to set filter applied state
   };
 
-  // const getAllVenues = async () => {
-  //     if (search === '' || location === '') dispatch(showLoading());
+  useEffect(() => {
+    if (!location?.name) {
+      getUserLocation(dispatch, setLocation);
+    }
+    dispatch(listTurfs({ location: location?.name }));
+  }, [dispatch, location?.name]);
 
-  //     try {
-  //         const [minPrice, maxPrice] = priceRange;
-  //         const response = await getAllVenuesAPI({
-  //             sort,
-  //             search,
-  //             sports,
-  //             selectedAmenities,
-  //             minPrice,
-  //             maxPrice,
-  //             location,
-  //         });
-
-  //         if (response) {
-  //             setAllVenues(response.data);
-  //         }
-  //     } catch (error) {
-  //         console.error(error);
-  //     } finally {
-  //         dispatch(hideLoading());
-  //     }
-  // };
+  const onChangeLocation = useCallback(() => {
+    setFilterState((prev) =>
+      Object.assign({}, prev, {
+        location: location?.name,
+      })
+    );
+  }, [location?.name]);
 
   useEffect(() => {
-    // TODO: get all venues
-    // getAllVenues();
-    getUserLocation(dispatch, setLocation);
-    dispatch(listTurfs());
-  }, [dispatch]);
+    onChangeLocation();
+  }, [onChangeLocation]);
+
+  useEffect(() => {
+    if (filterApplied) {
+      dispatch(listTurfs(filterState));
+    }
+  }, [dispatch, filterApplied, filterState]);
 
   return (
     <div className="bg-slate-100">
@@ -113,25 +109,33 @@ const TurfList = () => {
       <div className="w-full flex flex-col gap-y-5 items-center pb-10">
         <TurfListHeader
           turfs={turfs.turfs}
-          search={search}
-          setSearch={setSearch}
           setGridListing={setGridListing}
           setFilterApplied={setFilterApplied}
           handleFilterChange={handleFilterChange}
+          filterState={filterState}
+          setFilterState={setFilterState}
         />
-        {loading ? <Loader /> : <TurfGrid turfs={turfs.turfs} gridListing={gridListing} />}
+        {(!turfs?.turfs || turfs?.turfs?.length === 0) && <TurfListFallback />}
+        <TurfGrid turfs={turfs.turfs} gridListing={gridListing} loading={loading} />
         <Pagination currentPage={currentPage} onPageChange={handlePageChange} totalPages={turfs.totalPages} />
       </div>
     </div>
   );
 };
 
-const TurfGrid = ({ turfs, gridListing }) => (
+const TurfGrid = ({ turfs, gridListing, loading = false }) => (
   <Grid
     templateColumns={gridListing ? { base: 'repeat(1, 1fr)', md: 'repeat(4, 1fr)' } : 'repeat(1, 1fr)'}
     w="92%"
     gap={6}
   >
+    {loading &&
+      Array.from({ length: 4 })?.map((_, index) => (
+        <GridItem key={index} w="100%">
+          {gridListing ? <LoadingTurfCard /> : <LoadingTurfCardHorizontal />}
+        </GridItem>
+      ))}
+
     {turfs?.length > 0 &&
       turfs?.map((turf, index) => (
         <GridItem key={index} w="100%">

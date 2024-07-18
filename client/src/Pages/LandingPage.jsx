@@ -16,15 +16,14 @@ import sportAnimation from '../Components/lottie/sports.json';
 import { listTurfsForHome } from '../redux/slices/turf.slice';
 import TurfCard from '../Components/content/card/TurfCard';
 import FeatureCard from '../Components/content/card/FeatureCard';
+import { getUserLocation } from '../Utils/location.helper';
+import { setLocation } from '../redux/slices/auth.slice';
 
 function LandingPage() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { turfsForHome, loading } = useSelector((state) => state.turf);
-
-  useEffect(() => {
-    dispatch(listTurfsForHome());
-  }, [dispatch]);
+  const { location } = useSelector((state) => state.auth);
 
   const renderFeatureCards = () => {
     return Features.map((feature) => <FeatureCard key={feature.title} feature={feature} />);
@@ -33,6 +32,18 @@ function LandingPage() {
   const renderTurfCards = () => {
     return loading === false && turfsForHome?.map((turf) => <TurfCard key={turf._id} data={turf} />);
   };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!location?.name) {
+        await getUserLocation(dispatch, setLocation);
+      }
+      dispatch(listTurfsForHome());
+    };
+  
+    fetchData();
+  }, [dispatch, location?.name]);
+  
 
   return (
     <AnimatePresence mode="popLayout">
@@ -167,7 +178,7 @@ function LandingPage() {
         </motion.div>
 
         <Button
-          onClick={() => navigate('/venue-list')}
+          onClick={() => navigate('/turf-list')}
           mt={12}
           rightIcon={<ArrowForwardIcon />}
           color="gray.800"
