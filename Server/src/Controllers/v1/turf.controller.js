@@ -181,10 +181,24 @@ const create = asyncHandler(async (req, res, next) => {
 });
 
 const list = asyncHandler(async (req, res) => {
-  const { limit = 10, page = 1, search = "", status = "approved" } = req.query;
+  let {
+    limit = 10,
+    page = 1,
+    search = "",
+    status = "approved",
+    location = "",
+  } = req.query;
 
-  // Create a search query if a search term is provided
-  const searchQuery = {
+  if (location === "all") {
+    location = "";
+  }
+
+  // Convert limit and page to numbers
+  const limitNum = parseInt(limit, 10);
+  const pageNum = parseInt(page, 10);
+
+  // Define match conditions based on status and location
+  const matchConditions = {
     status,
     ...(search && {
       $or: [
@@ -192,14 +206,13 @@ const list = asyncHandler(async (req, res) => {
         { "location.name": { $regex: search, $options: "i" } },
       ],
     }),
+    ...(location && { "location.name": { $regex: location, $options: "i" } }),
   };
-
-  const { limitNum, skip, pageNum } = getPagination(page, limit);
 
   // Create the aggregation pipeline
   const pipeline = [
     {
-      $match: searchQuery,
+      $match: matchConditions,
     },
     {
       $lookup: {
@@ -222,51 +235,35 @@ const list = asyncHandler(async (req, res) => {
       },
     },
     {
-      $skip: skip,
-    },
-    {
-      $limit: limitNum,
-    },
-  ];
-
-  // Retrieve the total count of matching documents
-  const totalCountPipeline = [
-    {
-      $match: searchQuery,
-    },
-    {
-      $lookup: {
-        from: "users",
-        localField: "createdUserId",
-        foreignField: "_id",
-        as: "ownerDeletedStatus",
+      $facet: {
+        paginatedResults: [
+          { $skip: (pageNum - 1) * limitNum },
+          { $limit: limitNum },
+        ],
+        totalCount: [
+          {
+            $count: "count",
+          },
+        ],
       },
+    },
+    {
+      $unwind: { path: "$totalCount", preserveNullAndEmptyArrays: true },
     },
     {
       $addFields: {
-        ownerDeletedStatus: {
-          $first: "$ownerDeletedStatus.deleted",
-        },
+        totalCount: "$totalCount.count",
       },
-    },
-    {
-      $match: {
-        ownerDeletedStatus: { $ne: true },
-      },
-    },
-    {
-      $count: "totalCount",
     },
   ];
 
-  // Retrieve the total count of matching documents
-  const [totalCountResult] = await Turf.aggregate(totalCountPipeline);
-  const totalCount = totalCountResult ? totalCountResult.totalCount : 0;
+  // Execute the aggregation pipeline
+  const [result] = await Turf.aggregate(pipeline);
 
-  // Retrieve the paginated list of turfs
-  const turfs = await Turf.aggregate(pipeline);
+  // Extract paginatedResults and totalCount from the result
+  const { paginatedResults, totalCount } = result || { paginatedResults: [], totalCount: 0 };
 
-  if (!turfs || turfs.length === 0) {
+  if (!paginatedResults || paginatedResults.length === 0) {
     return res.status(404).json(new ApiResponse(404, {}, "No turfs found"));
   }
 
@@ -279,12 +276,10 @@ const list = asyncHandler(async (req, res) => {
     totalPages,
     currentPage: pageNum,
     pageSize: limitNum,
-    turfs,
+    turfs: paginatedResults,
   };
 
-  res
-    .status(200)
-    .json(new ApiResponse(200, response, "Turf listed successfully"));
+  res.status(200).json(new ApiResponse(200, response, "Turf listed successfully"));
 });
 
 const listForOwner = asyncHandler(async (req, res) => {
