@@ -26,16 +26,9 @@ import {
 const SportsTypes = ['Football', 'Cricket', 'Badminton', 'Swimming', 'Basketball', 'Tennis', 'VolleyBall'];
 const amenitiesFilter = ['Parking', 'Drinking Water', 'Washroom', 'Food Court', 'WiFi'];
 
-function RightDrawer({ setFilter, setFilterApplied }) {
+function RightDrawer({ setFilter, setFilterApplied, filterState, setFilterState }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const btnRef = React.useRef();
-
-  const [filterState, setFilterState] = useState({
-    sort: '',
-    sports: [],
-    selectedAmenities: [],
-    priceRange: [800, 6000],
-  });
 
   const handleChange = (key, value) => {
     setFilterState((prevState) => ({
