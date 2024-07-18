@@ -24,6 +24,9 @@ import { LocationPopover } from '../content/popover/LocationPopover';
 import { getUserLocation } from '../../Utils/location.helper';
 import { setLocation } from '../../redux/slices/auth.slice';
 import { listTurfs } from '../../redux/slices/turf.slice';
+import Breadcrumbs from '../content/breadcrumbs/Breadcrumbs';
+import TurfListHeader from '../content/headers/TurfListHeader';
+import Loader from '../loader/Loader';
 
 // TODO: fetch banner image from db
 const imageList = [
@@ -35,6 +38,11 @@ const imageList = [
     src: 'https://images.unsplash.com/photo-1487466365202-1afdb86c764e?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8Zm9vdGJhbGwlMjBncm91bmR8ZW58MHx8MHx8fDA%3D',
     alt: 'Outdoor Football Ground',
   },
+];
+
+const breadcrumbItems = [
+  { label: 'Home', to: '/' },
+  { label: 'Turf List', to: '/turf-list', isCurrentPage: true },
 ];
 
 const TurfList = () => {
@@ -79,7 +87,7 @@ const TurfList = () => {
     // TODO: get all venues
     // getAllVenues();
     getUserLocation(dispatch, setLocation);
-    // dispatch(listTurfs());
+    dispatch(listTurfs());
   }, [dispatch]);
 
   return (
@@ -99,83 +107,16 @@ const TurfList = () => {
           <LocationPopover location={location} />
         </div>
 
-        <Breadcrumb spacing="8px" separator={<ChevronRightIcon color="gray.500" className="w-4 h-4" />}>
-          <BreadcrumbItem>
-            <BreadcrumbLink as={Link} to="/">
-              Home
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbItem isCurrentPage>
-            <BreadcrumbLink as={Link} to="/turf-list">
-              Turf List
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-        </Breadcrumb>
+        <Breadcrumbs items={breadcrumbItems} />
       </motion.div>
+
       <div className="w-full flex flex-col gap-y-5 items-center pb-10">
-        <VenueStats
-          turfs={turfs}
-          search={search}
-          setSearch={setSearch}
-          setGridListing={setGridListing}
-          setFilter={setFilter}
-          setSort={setSort}
-          setSports={setSports}
-          setPriceRange={setPriceRange}
-          setSelectedAmenities={setSelectedAmenities}
-        />
-        <TurfGrid turfs={turfs} gridListing={gridListing} />
+        <TurfListHeader turfs={turfs} search={search} setSearch={setSearch} setGridListing={setGridListing} />
+        {loading ? <Loader /> : <TurfGrid turfs={turfs} gridListing={gridListing} />}
       </div>
     </div>
   );
 };
-
-const VenueStats = ({
-  turfs,
-  search,
-  setSearch,
-  setGridListing,
-  setFilter,
-  setSort,
-  setSports,
-  setPriceRange,
-  setSelectedAmenities,
-}) => (
-  <motion.div
-    initial={{ scale: 1.1, opacity: 0 }}
-    whileInView={{ scale: 1, opacity: 1 }}
-    transition={{ duration: 0.6, type: 'tween' }}
-    viewport={{ once: true }}
-    className="w-11/12 p-5 bg-white shadow-lg rounded-lg flex flex-col gap-y-2 md:flex-row items-center justify-between"
-  >
-    <h4 className="text-xl font-medium">
-      <span className="text-emerald-600">{turfs?.length}</span> Venues
-    </h4>
-    <div className="flex items-center gap-x-4">
-      <InputGroup borderColor="gray.300">
-        <InputLeftElement pointerEvents="none">
-          <MagnifyingGlassIcon color="gray.300" />
-        </InputLeftElement>
-        <Input onChange={(e) => setSearch(e.target.value)} value={search} type="search" placeholder="Name of turf" />
-      </InputGroup>
-      <ButtonGroup>
-        <Button onClick={() => setGridListing(false)} display={{ base: 'none', md: 'block' }}>
-          <ListBulletIcon className="h-6 w-6 text-slate-700" />
-        </Button>
-        <Button onClick={() => setGridListing(true)} display={{ base: 'none', md: 'block' }}>
-          <Squares2X2Icon className="h-6 w-6 text-slate-700" />
-        </Button>
-        {/* <RightDrawer
-          setFilter={setFilter}
-          setSort={setSort}
-          setSports={setSports}
-          setPriceRange={setPriceRange}
-          setSelectedAmenities={setSelectedAmenities}
-        /> */}
-      </ButtonGroup>
-    </div>
-  </motion.div>
-);
 
 const TurfGrid = ({ turfs, gridListing }) => (
   <Grid
