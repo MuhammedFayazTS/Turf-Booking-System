@@ -2,7 +2,7 @@ import React, { lazy, Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import ProtectedRoute from './ProtectedRoute';
 import PublicRoute from './PublicRoute';
-import Loader from '../Components/loader/Loader';
+import Loader from '../Components/core/loader/Loader';
 
 // Lazy-loaded components
 const LandingPage = lazy(() => import('../Pages/LandingPage'));

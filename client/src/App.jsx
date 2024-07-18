@@ -6,7 +6,7 @@ import { ArrowUpIcon } from '@heroicons/react/24/solid';
 import axios from 'axios';
 import { useEffect } from 'react';
 import { loadUser } from './redux/slices/auth.slice';
-import Loader from './Components/loader/Loader';
+import Loader from './Components/core/loader/Loader';
 
 function App() {
   axios.defaults.baseURL = process.env.REACT_APP_API;

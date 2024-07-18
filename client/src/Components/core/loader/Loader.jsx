@@ -1,6 +1,6 @@
 import React from 'react';
 import Lottie from 'react-lottie-player';
-import loaderAnimation from '../lottie/loader.json';
+import loaderAnimation from '../../lottie/loader.json';
 
 const Loader = ({ customStyles }) => {
   return loaderAnimation ? (
