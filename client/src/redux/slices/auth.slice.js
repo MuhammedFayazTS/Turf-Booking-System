@@ -5,6 +5,7 @@ import { handleApiResponse } from '../../Utils/toast.helper';
 const initialState = {
   loading: false,
   user: null,
+  location: null,
   token: null,
   isAuthenticated: false,
   error: '',
@@ -82,7 +83,18 @@ const signOut = createAsyncThunk('auth/signOut', async (_, { rejectWithValue }) 
 const authSlice = createSlice({
   name: 'auth',
   initialState,
-  reducers: {},
+  reducers: {
+    setLocation: (state, action) => {
+      state.location = action.payload;
+    },
+    updateLocation: (state, action) => {
+      if (state.location) {
+        state.location = { ...state.location, ...action.payload };
+      } else {
+        state.location = action.payload;
+      }
+    },
+  },
   extraReducers: (builder) => {
     builder.addCase(signUp.pending, (state) => {
       state.loading = true;
@@ -163,4 +175,5 @@ const authSlice = createSlice({
 });
 
 export { signUp, signIn, loadUser, refreshToken, signOut };
+export const { setLocation, updateLocation } = authSlice.actions;
 export default authSlice.reducer;

@@ -1,13 +1,9 @@
 import { motion } from 'framer-motion';
 import { InputGroup, InputLeftElement, Input, ButtonGroup, Button } from '@chakra-ui/react';
 import { ListBulletIcon, MagnifyingGlassIcon, Squares2X2Icon } from '@heroicons/react/24/outline';
+import RightDrawer from '../drawer/RightDrawer';
 
-const TurfListHeader = ({
-  turfs,
-  search,
-  setSearch,
-  setGridListing,
-}) => (
+const TurfListHeader = ({ turfs, search, setSearch, setGridListing, handleFilterChange, setFilterApplied }) => (
   <motion.div
     initial={{ scale: 1.1, opacity: 0 }}
     whileInView={{ scale: 1, opacity: 1 }}
@@ -21,14 +17,9 @@ const TurfListHeader = ({
     <div className="flex items-center gap-x-4">
       <InputGroup borderColor="gray.300">
         <InputLeftElement pointerEvents="none">
-          <MagnifyingGlassIcon color="gray.300" className='w-5 h-5' />
+          <MagnifyingGlassIcon color="gray.300" className="w-5 h-5" />
         </InputLeftElement>
-        <Input 
-          onChange={(e) => setSearch(e.target.value)} 
-          value={search} 
-          type="search" 
-          placeholder="Name of turf" 
-        />
+        <Input onChange={(e) => setSearch(e.target.value)} value={search} type="search" placeholder="Name of turf" />
       </InputGroup>
       <ButtonGroup>
         <Button onClick={() => setGridListing(false)} display={{ base: 'none', md: 'block' }}>
@@ -38,6 +29,8 @@ const TurfListHeader = ({
           <Squares2X2Icon className="h-6 w-6 text-slate-700" />
         </Button>
       </ButtonGroup>
+
+      <RightDrawer setFilter={handleFilterChange} setFilterApplied={setFilterApplied} />
     </div>
   </motion.div>
 );

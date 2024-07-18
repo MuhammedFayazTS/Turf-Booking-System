@@ -2,21 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  Button,
-  ButtonGroup,
-  Grid,
-  GridItem,
-  Input,
-  InputGroup,
-  InputLeftElement,
-} from '@chakra-ui/react';
-import { ChevronRightIcon, ListBulletIcon, Squares2X2Icon, MagnifyingGlassIcon } from '@heroicons/react/24/solid';
+import { Grid, GridItem } from '@chakra-ui/react';
 import Carousel from '../Swiper/Carousel';
-import RightDrawer from '../Drawer/RightDrawer';
 import Header from '../core/Header/Header';
 import TurfCard from '../content/card/TurfCard';
 import TurfCardHorizontal from '../content/card/TurfCardHorizontal';
@@ -27,6 +14,7 @@ import { listTurfs } from '../../redux/slices/turf.slice';
 import Breadcrumbs from '../content/breadcrumbs/Breadcrumbs';
 import TurfListHeader from '../content/headers/TurfListHeader';
 import Loader from '../loader/Loader';
+import Pagination from '../content/pagination/Pagination';
 
 // TODO: fetch banner image from db
 const imageList = [
@@ -57,6 +45,18 @@ const TurfList = () => {
   const [selectedAmenities, setSelectedAmenities] = useState([]);
   const [filter, setFilter] = useState(false);
   const [gridListing, setGridListing] = useState(true);
+  const [filterApplied, setFilterApplied] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    // TODO: Implement logic to fetch data for the new page
+  };
+
+  const handleFilterChange = () => {
+    // TODO: Implement your logic to apply filters
+    setFilterApplied(true); // Example logic to set filter applied state
+  };
 
   // const getAllVenues = async () => {
   //     if (search === '' || location === '') dispatch(showLoading());
@@ -111,8 +111,16 @@ const TurfList = () => {
       </motion.div>
 
       <div className="w-full flex flex-col gap-y-5 items-center pb-10">
-        <TurfListHeader turfs={turfs} search={search} setSearch={setSearch} setGridListing={setGridListing} />
-        {loading ? <Loader /> : <TurfGrid turfs={turfs} gridListing={gridListing} />}
+        <TurfListHeader
+          turfs={turfs.turfs}
+          search={search}
+          setSearch={setSearch}
+          setGridListing={setGridListing}
+          setFilterApplied={setFilterApplied}
+          handleFilterChange={handleFilterChange}
+        />
+        {loading ? <Loader /> : <TurfGrid turfs={turfs.turfs} gridListing={gridListing} />}
+        <Pagination currentPage={currentPage} onPageChange={handlePageChange} totalPages={turfs.totalPages} />
       </div>
     </div>
   );
@@ -124,8 +132,8 @@ const TurfGrid = ({ turfs, gridListing }) => (
     w="92%"
     gap={6}
   >
-    {turfs.length > 0 &&
-      turfs.map((turf, index) => (
+    {turfs?.length > 0 &&
+      turfs?.map((turf, index) => (
         <GridItem key={index} w="100%">
           {gridListing ? <TurfCard data={turf} /> : <TurfCardHorizontal data={turf} />}
         </GridItem>

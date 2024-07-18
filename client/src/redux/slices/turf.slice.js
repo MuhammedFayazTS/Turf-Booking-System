@@ -50,7 +50,7 @@ const turfSlice = createSlice({
     });
     builder.addCase(listTurfs.fulfilled, (state, action) => {
       state.loading = false;
-      state.turfs = action.payload.data.turfs;
+      state.turfs = action.payload.data;
       state.error = '';
     });
     builder.addCase(listTurfs.rejected, (state, action) => {
