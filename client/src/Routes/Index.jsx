@@ -8,6 +8,8 @@ import Loader from '../Components/loader/Loader';
 const LandingPage = lazy(() => import('../Pages/LandingPage'));
 const SignUp = lazy(() => import('../Components/pages/SignUp'));
 const SignIn = lazy(() => import('../Components/pages/SignIn'));
+const TurfList = lazy(() => import('../Components/pages/TurfList'));
+const PageNotFound = lazy(() => import('../Components/pages/PageNotFound'));
 
 // Routes component
 const Index = () => {
@@ -22,7 +24,11 @@ const Index = () => {
           <Route path="/sign-in" element={<SignIn />} />
         </Route>
         {/* protected routes */}
-        <Route element={<ProtectedRoute />}>{/* <Route path="/" element={<LandingPage />} /> */}</Route>
+        <Route element={<ProtectedRoute />}>
+          <Route path="/turf-list" element={<TurfList />} />
+        </Route>
+        {/* page not found */}
+        <Route path="*" element={<PageNotFound />} />
       </Routes>
     </Suspense>
   );

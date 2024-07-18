@@ -18,6 +18,15 @@ const listTurfsForHome = createAsyncThunk('turf/listTurfsForHome', async (_, { r
   }
 });
 
+const listTurfs = createAsyncThunk('turf/listTurfs', async (_, { rejectWithValue }) => {
+  try {
+    const response = await axios.get('/turf/list');
+    return response.data;
+  } catch (error) {
+    return rejectWithValue(error.response.data);
+  }
+});
+
 const turfSlice = createSlice({
   name: 'turf',
   initialState,
@@ -36,8 +45,21 @@ const turfSlice = createSlice({
       state.turfsForHome = null;
       state.error = action.payload ? action.payload.message : action.error.message;
     });
+    builder.addCase(listTurfs.pending, (state) => {
+      state.loading = true;
+    });
+    builder.addCase(listTurfs.fulfilled, (state, action) => {
+      state.loading = false;
+      state.turfs = action.payload.data.turfs;
+      state.error = '';
+    });
+    builder.addCase(listTurfs.rejected, (state, action) => {
+      state.loading = false;
+      state.turfs = [];
+      state.error = action.payload ? action.payload.message : action.error.message;
+    });
   },
 });
 
-export { listTurfsForHome };
+export { listTurfsForHome, listTurfs };
 export default turfSlice.reducer;
