@@ -1,13 +1,19 @@
 import { motion } from 'framer-motion';
 import { InputGroup, InputLeftElement, Input, ButtonGroup, Button } from '@chakra-ui/react';
 import { ListBulletIcon, MagnifyingGlassIcon, Squares2X2Icon } from '@heroicons/react/24/outline';
+import {
+  ListBulletIcon as ListBulletIconSolid,
+  Squares2X2Icon as Squares2X2IconSolid,
+} from '@heroicons/react/24/solid';
 import RightDrawer from '../drawer/RightDrawer';
 import { useDispatch } from 'react-redux';
 import { listTurfs } from '../../../redux/slices/turf.slice';
 import { debounce } from 'lodash';
+import { useSearchParams } from 'react-router-dom';
 
 const TurfListHeader = ({
   turfs,
+  gridListing,
   setGridListing,
   handleFilterChange,
   setFilterApplied,
@@ -15,10 +21,12 @@ const TurfListHeader = ({
   setFilterState,
 }) => {
   const dispatch = useDispatch();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const handleSearch = (e) => {
     const searchTerm = e.target.value;
-    debouncedSearch(searchTerm);
+    setSearchParams({ search: searchTerm });
+    debouncedSearch(searchParams.get('search'));
   };
 
   const debouncedSearch = debounce((searchTerm) => {
@@ -51,10 +59,18 @@ const TurfListHeader = ({
         </InputGroup>
         <ButtonGroup>
           <Button onClick={() => setGridListing(false)} display={{ base: 'none', md: 'block' }}>
-            <ListBulletIcon className="h-6 w-6 text-slate-700" />
+            {gridListing === false ? (
+              <ListBulletIconSolid className="h-6 w-6 text-green-700" />
+            ) : (
+              <ListBulletIcon className="h-6 w-6 text-slate-700" />
+            )}
           </Button>
           <Button onClick={() => setGridListing(true)} display={{ base: 'none', md: 'block' }}>
-            <Squares2X2Icon className="h-6 w-6 text-slate-700" />
+            {gridListing === true ? (
+              <Squares2X2IconSolid className="h-6 w-6 text-green-700" />
+            ) : (
+              <Squares2X2Icon className="h-6 w-6 text-slate-700" />
+            )}
           </Button>
         </ButtonGroup>
 

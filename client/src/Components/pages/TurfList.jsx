@@ -109,6 +109,7 @@ const TurfList = () => {
       <div className="w-full flex flex-col gap-y-5 items-center pb-10">
         <TurfListHeader
           turfs={turfs.turfs}
+          gridListing={gridListing}
           setGridListing={setGridListing}
           setFilterApplied={setFilterApplied}
           handleFilterChange={handleFilterChange}
