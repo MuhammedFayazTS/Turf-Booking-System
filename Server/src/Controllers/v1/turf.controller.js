@@ -162,7 +162,7 @@ const create = asyncHandler(async (req, res, next) => {
 
     sendAdminNotifications(title, message, "info", data);
     //notification to owner asking to wait for approval
-    const notificationTitleForOwner = "Turf Addition Request Sent Successfully";
+    const notificationTitleForOwner = "Turf Add Request Sent Successfully";
     const notificationMessageForOwner =
       "Your request to add a new turf has been successfully submitted. Please await approval from the administrator.";
 
@@ -261,7 +261,10 @@ const list = asyncHandler(async (req, res) => {
   const [result] = await Turf.aggregate(pipeline);
 
   // Extract paginatedResults and totalCount from the result
-  const { paginatedResults, totalCount } = result || { paginatedResults: [], totalCount: 0 };
+  const { paginatedResults, totalCount } = result || {
+    paginatedResults: [],
+    totalCount: 0,
+  };
 
   if (!paginatedResults || paginatedResults.length === 0) {
     return res.status(404).json(new ApiResponse(404, {}, "No turfs found"));
@@ -279,7 +282,9 @@ const list = asyncHandler(async (req, res) => {
     turfs: paginatedResults,
   };
 
-  res.status(200).json(new ApiResponse(200, response, "Turf listed successfully"));
+  res
+    .status(200)
+    .json(new ApiResponse(200, response, "Turf listed successfully"));
 });
 
 const listForOwner = asyncHandler(async (req, res) => {
