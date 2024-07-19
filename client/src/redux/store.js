@@ -3,11 +3,13 @@ import { combineReducers } from 'redux';
 import alertReducer from './alertSlice';
 import authReducer from './slices/auth.slice';
 import turfReducer from './slices/turf.slice';
+import notificationReducer from './slices/notification.slice';
 import { createLogger } from 'redux-logger';
 
 const rootReducer = combineReducers({
   auth: authReducer,
   turf: turfReducer,
+  notification: notificationReducer,
   alerts: alertReducer,
 });
 

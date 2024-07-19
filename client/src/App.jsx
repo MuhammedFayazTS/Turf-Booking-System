@@ -8,6 +8,7 @@ import Loader from './Components/core/loader/Loader';
 import useAxiosInterceptors from './hooks/useApiInterceptors';
 import { useEffect } from 'react';
 import { loadUser } from './redux/slices/auth.slice';
+import { useLocation } from 'react-router-dom';
 
 function App() {
   axios.defaults.baseURL = process.env.REACT_APP_API;
@@ -15,14 +16,16 @@ function App() {
   const { loading } = useSelector((state) => state.alerts);
   const { loading: userLoading, isAuthenticated, user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
+  const location = useLocation();
 
   useAxiosInterceptors();
 
   useEffect(() => {
-    if (!userLoading && (!isAuthenticated || !user)) {
+    const paths = ['/sign-in', '/sign-up'];
+    if (!userLoading && !paths.includes(location.pathname) && (!isAuthenticated || !user)) {
       dispatch(loadUser());
     }
-  }, [dispatch, isAuthenticated, userLoading, user]);
+  }, [dispatch, isAuthenticated, userLoading, user, location]);
 
   return (
     <>

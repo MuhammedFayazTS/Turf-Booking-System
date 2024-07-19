@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button } from '@chakra-ui/react';
@@ -7,11 +7,13 @@ import NavbarLinks from './NavbarLinks';
 import UserMenu from './UserMenu';
 import MobileMenuToggle from './MobileMenuToggle';
 import { signOut } from '../../../redux/slices/auth.slice';
+import { listUnseenNotifications } from '../../../redux/slices/notification.slice';
 // logo
 const Logo = '/assets/logo/logo-no-bg.png';
 
 const Header = ({ pos }) => {
   const { isAuthenticated, user } = useSelector((state) => state.auth);
+  const { unseenNotifications } = useSelector((state) => state.notification);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [open, setOpen] = useState(false);
@@ -36,6 +38,10 @@ const Header = ({ pos }) => {
     }
   };
 
+  useEffect(() => {
+    dispatch(listUnseenNotifications());
+  }, [dispatch]);
+
   return (
     <header
       className={`w-full transition-all ease-in-out ${
@@ -53,7 +59,7 @@ const Header = ({ pos }) => {
         <NavbarLinks open={open} setOpen={setOpen} />
 
         {isAuthenticated === true ? (
-          <UserMenu user={user} handleSignOut={handleSignOut} />
+          <UserMenu user={user} handleSignOut={handleSignOut} notifications={unseenNotifications.notifications} />
         ) : (
           <Button
             display={{ base: 'none', md: 'flex' }}

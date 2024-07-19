@@ -12,23 +12,13 @@ import {
   Portal,
 } from '@chakra-ui/react';
 import { Link, useNavigate } from 'react-router-dom';
-import { BellIcon } from '@chakra-ui/icons';
+import NotificationsMenu from './NotificationsMenu';
 
-const UserMenu = ({ user, handleSignOut }) => {
-  const navigate = useNavigate();
-
+const UserMenu = ({ user, handleSignOut,notifications }) => {
   return (
-    <div className="flex absolute md:relative right-16 md:right-0 top-4 md:top-0 md:space-x-1 items-center">
-      <IconButton onClick={() => navigate('/my-profile/notifications')} isRound variant="ghost">
-        <div className="relative">
-          <BellIcon w={6} h={6} />
-          {user?.notifications?.length > 0 && (
-            <div className="w-5 h-5 bg-green-500 absolute -top-3 -right-3 rounded-full flex items-center justify-center">
-              <span className="text-sm text-white">{user?.notifications.length}</span>
-            </div>
-          )}
-        </div>
-      </IconButton>
+    <div className="flex absolute md:relative right-16 md:right-0 top-4 md:top-0 md:space-x-2 items-center">
+      
+      <NotificationsMenu notifications={notifications} />
 
       <Menu>
         <MenuButton as={IconButton} isRound colorScheme="gray" variant="ghost">
