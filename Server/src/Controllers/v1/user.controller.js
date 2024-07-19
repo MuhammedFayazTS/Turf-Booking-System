@@ -1,5 +1,6 @@
 import Joi from "@hapi/joi";
 import User from "../../models/user.model.js";
+import Notification from "../../models/notification.model.js";
 import { asyncHandler } from "../../utils/asyncHandler.js";
 import { ApiError } from "../../utils/ApiError.js";
 import { ApiResponse } from "../../utils/ApiResponse.js";
@@ -272,6 +273,18 @@ const destroy = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, deleted, "User deleted successfully"));
 });
 
+const getUnseenNotifications = asyncHandler(async (req, res) => {
+  const notifications = await Notification.find({ userId: req.user._id });
+  if (!notifications) {
+    return res.status(404, new ApiResponse(404, [], "No unseen notifications"));
+  }
+  res
+    .status(200)
+    .json(
+      new ApiResponse(200, { notifications }, "Unseen notifications are listed")
+    );
+});
+
 export {
   changeUserRole,
   list,
@@ -281,4 +294,5 @@ export {
   updateUserDetails,
   updateUserImage,
   destroy,
+  getUnseenNotifications
 };
