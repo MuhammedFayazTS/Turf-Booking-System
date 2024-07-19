@@ -9,9 +9,9 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import Header from '../Components/core/Header/Header';
 import Lottie from 'react-lottie-player';
-import Footer from '../Components/Footer/Footer';
+import Footer from '../Components/core/Footer/Footer';
 import NewsLetterBox from '../Components/NewsLetterBox/NewsLetterBox';
-import FAQ from '../Components/FAQ/FAQ';
+import FAQ from '../Components/content/faq/FAQ';
 import sportAnimation from '../Components/lottie/sports.json';
 import { listTurfsForHome } from '../redux/slices/turf.slice';
 import TurfCard from '../Components/content/card/TurfCard';
@@ -40,10 +40,9 @@ function LandingPage() {
       }
       dispatch(listTurfsForHome());
     };
-  
+
     fetchData();
   }, [dispatch, location?.name]);
-  
 
   return (
     <AnimatePresence mode="popLayout">

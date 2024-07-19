@@ -138,7 +138,7 @@ const TurfGrid = ({ turfs, gridListing, loading = false }) => (
 
     {turfs?.length > 0 &&
       turfs?.map((turf, index) => (
-        <GridItem key={index} w="100%">
+        <GridItem key={turf._id} w="100%">
           {gridListing ? <TurfCard data={turf} /> : <TurfCardHorizontal data={turf} />}
         </GridItem>
       ))}

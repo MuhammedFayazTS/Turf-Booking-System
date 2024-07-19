@@ -53,7 +53,7 @@ const loadUser = createAsyncThunk('auth/loadUser', async (_, { rejectWithValue, 
   }
 });
 
-const refreshToken = createAsyncThunk('auth/refreshToken', async ({ rejectWithValue, getState }) => {
+const refreshToken = createAsyncThunk('auth/refreshToken', async (_, { getState, rejectWithValue }) => {
   try {
     const state = getState();
     const config = {
@@ -64,9 +64,9 @@ const refreshToken = createAsyncThunk('auth/refreshToken', async ({ rejectWithVa
     };
     const response = await axios.post('/auth/refresh-token', {}, config);
     localStorage.setItem('tokenExpiresAt', response.data.tokenExpiresAt);
-    return response.data;
+    return response.data; // This will be the payload of the fulfilled action
   } catch (error) {
-    return rejectWithValue(error.response.data);
+    return rejectWithValue(error.response.data); // This will be handled in the rejected case
   }
 });
 
@@ -76,6 +76,16 @@ const signOut = createAsyncThunk('auth/signOut', async (_, { rejectWithValue }) 
     localStorage.removeItem('tokenExpiresAt');
     return response.data;
   } catch (error) {
+    return rejectWithValue(error.response.data);
+  }
+});
+
+const protectedRoute = createAsyncThunk('auth/protected', async (_, { rejectWithValue }) => {
+  try {
+    const response = await axios.post('/auth/protected');
+    return response.data;
+  } catch (error) {
+    handleApiResponse(error.response, '', 'Not authorized for this page');
     return rejectWithValue(error.response.data);
   }
 });
@@ -94,86 +104,104 @@ const authSlice = createSlice({
         state.location = action.payload;
       }
     },
+    setAuthLoading: (state) => {
+      state.loading = true;
+    },
   },
   extraReducers: (builder) => {
-    builder.addCase(signUp.pending, (state) => {
-      state.loading = true;
-    });
-    builder.addCase(signUp.fulfilled, (state, action) => {
-      state.loading = false;
-      state.user = null;
-      state.error = '';
-    });
-    builder.addCase(signUp.rejected, (state, action) => {
-      state.loading = false;
-      state.user = null;
-      state.error = action.payload ? action.payload.message : action.error.message;
-    });
-    builder.addCase(signIn.pending, (state) => {
-      state.loading = true;
-    });
-    builder.addCase(signIn.fulfilled, (state, action) => {
-      state.loading = false;
-      state.user = action.payload.data.user;
-      state.token = action.payload.token;
-      state.isAuthenticated = true;
-      state.error = '';
-      localStorage.setItem('tokenExpiresAt', action.payload.data.tokenExpiresAt);
-    });
-    builder.addCase(signIn.rejected, (state, action) => {
-      state.loading = false;
-      state.user = null;
-      state.token = null;
-      state.isAuthenticated = false;
-      state.error = action.payload ? action.payload.message : action.error.message;
-    });
-    builder.addCase(loadUser.pending, (state) => {
-      state.loading = true;
-    });
-    builder.addCase(loadUser.fulfilled, (state, action) => {
-      state.loading = false;
-      state.user = action.payload?.data;
-      state.isAuthenticated = true;
-      state.error = '';
-    });
-    builder.addCase(loadUser.rejected, (state, action) => {
-      state.loading = false;
-      state.user = null;
-      state.isAuthenticated = false;
-      state.error = action.payload ? action.payload.message : action.error.message;
-    });
-    builder.addCase(refreshToken.pending, (state) => {
-      state.loading = true;
-    });
-    builder.addCase(refreshToken.fulfilled, (state, action) => {
-      state.loading = false;
-      state.token = action.payload.token;
-      state.isAuthenticated = true;
-      state.error = '';
-      localStorage.setItem('tokenExpiresAt', action.payload.tokenExpiresAt);
-    });
-    builder.addCase(refreshToken.rejected, (state, action) => {
-      state.loading = false;
-      state.error = action.payload;
-      state.isAuthenticated = false;
-    });
-    builder.addCase(signOut.pending, (state) => {
-      state.loading = true;
-    });
-    builder.addCase(signOut.fulfilled, (state) => {
-      state.loading = false;
-      state.user = null;
-      state.token = null;
-      state.isAuthenticated = false;
-      state.error = '';
-    });
-    builder.addCase(signOut.rejected, (state, action) => {
-      state.loading = false;
-      state.error = action.payload ? action.payload.message : action.error.message;
-    });
+    builder
+      .addCase(signUp.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(signUp.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = null;
+        state.error = '';
+      })
+      .addCase(signUp.rejected, (state, action) => {
+        state.loading = false;
+        state.user = null;
+        state.error = action.payload ? action.payload.message : action.error.message;
+      })
+      .addCase(signIn.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(signIn.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload.data.user;
+        state.token = action.payload.token;
+        state.isAuthenticated = true;
+        state.error = '';
+        localStorage.setItem('tokenExpiresAt', action.payload.data.tokenExpiresAt);
+      })
+      .addCase(signIn.rejected, (state, action) => {
+        state.loading = false;
+        state.user = null;
+        state.token = null;
+        state.isAuthenticated = false;
+        state.error = action.payload ? action.payload.message : action.error.message;
+      })
+      .addCase(loadUser.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(loadUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload?.data;
+        state.isAuthenticated = true;
+        state.error = '';
+      })
+      .addCase(loadUser.rejected, (state, action) => {
+        state.loading = false;
+        state.user = null;
+        state.isAuthenticated = false;
+        state.error = action.payload ? action.payload.message : action.error.message;
+      })
+      .addCase(refreshToken.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(refreshToken.fulfilled, (state, action) => {
+        state.loading = false;
+        state.token = action.payload.token;
+        state.isAuthenticated = true;
+        state.error = '';
+        localStorage.setItem('tokenExpiresAt', action.payload.tokenExpiresAt);
+      })
+      .addCase(refreshToken.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+        state.isAuthenticated = false;
+      })
+      .addCase(signOut.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(signOut.fulfilled, (state) => {
+        state.loading = false;
+        state.user = null;
+        state.token = null;
+        state.isAuthenticated = false;
+        state.error = '';
+      })
+      .addCase(signOut.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload ? action.payload.message : action.error.message;
+      })
+      .addCase(protectedRoute.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(protectedRoute.fulfilled, (state, action) => {
+        state.loading = false;
+        state.isAuthenticated = true;
+        state.user = action.payload.data.user;
+        state.error = '';
+      })
+      .addCase(protectedRoute.rejected, (state, action) => {
+        state.loading = false;
+        state.isAuthenticated = false;
+        state.error = action.payload ? action.payload.message : action.error.message;
+      });
   },
 });
 
-export { signUp, signIn, loadUser, refreshToken, signOut };
-export const { setLocation, updateLocation } = authSlice.actions;
+export { signUp, signIn, loadUser, refreshToken, signOut, protectedRoute };
+export const { setLocation, updateLocation, setAuthLoading } = authSlice.actions;
 export default authSlice.reducer;

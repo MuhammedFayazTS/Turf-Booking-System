@@ -18,9 +18,10 @@ const listTurfsForHome = createAsyncThunk('turf/listTurfsForHome', async (_, { r
   }
 });
 
-const listTurfs = createAsyncThunk('turf/listTurfs', async (_, { rejectWithValue }) => {
+const listTurfs = createAsyncThunk('turf/listTurfs', async (filter, { rejectWithValue }) => {
   try {
-    const response = await axios.get('/turf/list');
+    const { search = '', location = '' } = filter;
+    const response = await axios.get(`/turf/list?search=${search}&location=${location}`);
     return response.data;
   } catch (error) {
     return rejectWithValue(error.response.data);

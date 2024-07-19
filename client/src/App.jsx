@@ -4,22 +4,25 @@ import Routes from './Routes/Index';
 import { ScrollToTop } from 'react-simple-scroll-up';
 import { ArrowUpIcon } from '@heroicons/react/24/solid';
 import axios from 'axios';
+import Loader from './Components/core/loader/Loader';
+import useAxiosInterceptors from './hooks/useApiInterceptors';
 import { useEffect } from 'react';
 import { loadUser } from './redux/slices/auth.slice';
-import Loader from './Components/core/loader/Loader';
 
 function App() {
   axios.defaults.baseURL = process.env.REACT_APP_API;
   axios.defaults.withCredentials = true;
-  const dispatch = useDispatch();
   const { loading } = useSelector((state) => state.alerts);
-  const { token, loading: userLoading, user, isAuthenticated } = useSelector((state) => state.auth);
+  const { loading: userLoading, isAuthenticated, user } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
+
+  useAxiosInterceptors();
 
   useEffect(() => {
-    if (!user && !isAuthenticated) {
+    if (!userLoading && (!isAuthenticated || !user)) {
       dispatch(loadUser());
     }
-  }, [dispatch, user]);
+  }, [dispatch, isAuthenticated, userLoading, user]);
 
   return (
     <>

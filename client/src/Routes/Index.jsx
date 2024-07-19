@@ -1,9 +1,8 @@
-import React, { lazy, Suspense } from 'react';
+import React, { lazy, Suspense, useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import ProtectedRoute from './ProtectedRoute';
 import PublicRoute from './PublicRoute';
 import Loader from '../Components/core/loader/Loader';
-
 // Lazy-loaded components
 const LandingPage = lazy(() => import('../Pages/LandingPage'));
 const SignUp = lazy(() => import('../Components/pages/SignUp'));
