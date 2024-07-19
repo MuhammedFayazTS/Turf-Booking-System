@@ -251,4 +251,12 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
   }
 });
 
-export { signUp, signIn, signOut, refreshAccessToken };
+const protectedRoute = asyncHandler(async (req, res) => {
+  res
+    .status(200)
+    .json(
+      new ApiResponse(200, { user: req.user }, "Access to protected routes")
+    );
+});
+
+export { signUp, signIn, signOut, refreshAccessToken, protectedRoute };
