@@ -16,7 +16,7 @@ import TurfListHeader from '../content/headers/TurfListHeader';
 import Pagination from '../content/pagination/Pagination';
 import LoadingTurfCard from '../content/card/LoadingTurfCard';
 import LoadingTurfCardHorizontal from '../content/card/LoadingTurfCardHorizontal';
-import TurfListFallback from '../content/fallback/TurfListFallback';
+import NotFoundFallback from '../content/fallback/NotFoundFallback';
 
 const imageList = [
   {
@@ -36,7 +36,6 @@ const breadcrumbItems = [
 
 const TurfList = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const { loading, turfs } = useSelector((state) => state.turf);
   const { location } = useSelector((state) => state.auth);
   const [gridListing, setGridListing] = useState(true);
@@ -116,7 +115,7 @@ const TurfList = () => {
           filterState={filterState}
           setFilterState={setFilterState}
         />
-        {(!turfs?.turfs || turfs?.turfs?.length === 0) && <TurfListFallback />}
+        {(!turfs?.turfs || turfs?.turfs?.length === 0) && <NotFoundFallback message={'We can&apos;t find any turfs'} />}
         <TurfGrid turfs={turfs.turfs} gridListing={gridListing} loading={loading} />
         <Pagination currentPage={currentPage} onPageChange={handlePageChange} totalPages={turfs.totalPages} />
       </div>
