@@ -1,6 +1,8 @@
 import Turf from "../../models/turf.model.js";
 import TimingOptions from "../../models/timing.options.model.js";
 import Timing from "../../models/timing.model.js";
+import Sport from "../../models/sports.model.js";
+import Amenities from "../../models/amenity.model.js";
 import { asyncHandler } from "../../utils/asyncHandler.js";
 import { ApiResponse } from "../../utils/ApiResponse.js";
 import Joi from "@hapi/joi";
@@ -392,7 +394,10 @@ const getOne = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Invalid turf id", "Invalid turf id");
   }
 
-  const turf = await Turf.findById(id);
+  const turf = await Turf.findById(id)
+    .populate("timingsId")
+    .populate("sportsId")
+    .populate("amenitiesId");
 
   if (!turf) {
     return res.status(404).json(new ApiResponse(404, {}, "Turf not found"));

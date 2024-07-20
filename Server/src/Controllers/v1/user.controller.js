@@ -274,7 +274,10 @@ const destroy = asyncHandler(async (req, res) => {
 });
 
 const getUnseenNotifications = asyncHandler(async (req, res) => {
-  const notifications = await Notification.find({ userId: req.user._id });
+  const notifications = await Notification.find({
+    userId: req.user._id,
+    isRead: false,
+  });
   if (!notifications) {
     return res.status(404, new ApiResponse(404, [], "No unseen notifications"));
   }
@@ -294,5 +297,5 @@ export {
   updateUserDetails,
   updateUserImage,
   destroy,
-  getUnseenNotifications
+  getUnseenNotifications,
 };
