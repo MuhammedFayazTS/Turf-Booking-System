@@ -8,6 +8,7 @@ const LandingPage = lazy(() => import('../Pages/LandingPage'));
 const SignUp = lazy(() => import('../Components/pages/SignUp'));
 const SignIn = lazy(() => import('../Components/pages/SignIn'));
 const TurfList = lazy(() => import('../Components/pages/TurfList'));
+const TurfDisplay = lazy(() => import('../Components/pages/TurfDisplay'));
 const PageNotFound = lazy(() => import('../Components/pages/PageNotFound'));
 
 // Routes component
@@ -25,6 +26,7 @@ const Index = () => {
         {/* protected routes */}
         <Route element={<ProtectedRoute />}>
           <Route path="/turf-list" element={<TurfList />} />
+          <Route path="/turf/:id" element={<TurfDisplay />} />
         </Route>
         {/* page not found */}
         <Route path="*" element={<PageNotFound />} />

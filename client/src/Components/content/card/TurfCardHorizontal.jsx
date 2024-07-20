@@ -4,7 +4,7 @@ import { MapPinIcon } from '@heroicons/react/24/solid';
 import { motion } from 'framer-motion';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import DisplayStarRating from '../../Reviews & Rating/DisplayStarRating';
+import DisplayStarRating from '../review_and_rating/DisplayStarRating';
 
 const defaultImage = 'https://placehold.co/800@3x.png';
 

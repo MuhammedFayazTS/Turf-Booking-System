@@ -59,7 +59,7 @@ const Header = ({ pos }) => {
         <NavbarLinks open={open} setOpen={setOpen} />
 
         {isAuthenticated === true ? (
-          <UserMenu user={user} handleSignOut={handleSignOut} notifications={unseenNotifications.notifications} />
+          <UserMenu user={user} handleSignOut={handleSignOut} notifications={unseenNotifications?.notifications} />
         ) : (
           <Button
             display={{ base: 'none', md: 'flex' }}

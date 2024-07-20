@@ -1,11 +1,11 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
-import { handleApiResponse } from '../../Utils/toast.helper';
 
 const initialState = {
   loading: false,
   turfs: [],
   turfsForHome: null,
+  turfDetails: null,
   error: '',
 };
 
@@ -22,6 +22,15 @@ const listTurfs = createAsyncThunk('turf/listTurfs', async (filter, { rejectWith
   try {
     const { search = '', location = '' } = filter;
     const response = await axios.get(`/turf/list?search=${search}&location=${location}`);
+    return response.data;
+  } catch (error) {
+    return rejectWithValue(error.response.data);
+  }
+});
+
+const getTurfDetails = createAsyncThunk('turf/getTurfDetails', async (id, { rejectWithValue }) => {
+  try {
+    const response = await axios.get(`/turf/${id}`);
     return response.data;
   } catch (error) {
     return rejectWithValue(error.response.data);
@@ -59,8 +68,21 @@ const turfSlice = createSlice({
       state.turfs = [];
       state.error = action.payload ? action.payload.message : action.error.message;
     });
+    builder.addCase(getTurfDetails.pending, (state) => {
+      state.loading = true;
+    });
+    builder.addCase(getTurfDetails.fulfilled, (state, action) => {
+      state.loading = false;
+      state.turfDetails = action.payload.data;
+      state.error = '';
+    });
+    builder.addCase(getTurfDetails.rejected, (state, action) => {
+      state.loading = false;
+      state.turfDetails = null;
+      state.error = action.payload ? action.payload.message : action.error.message;
+    });
   },
 });
 
-export { listTurfsForHome, listTurfs };
+export { listTurfsForHome, listTurfs,getTurfDetails };
 export default turfSlice.reducer;
