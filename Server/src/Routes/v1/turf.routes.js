@@ -9,6 +9,7 @@ import {
   validateUpdateTurfInput,
   updateTurfImages,
   updateTurfDocuments,
+  listTurfsForHome,
 } from "../../Controllers/v1/turf.controller.js";
 import { attachUserId } from "../../middlewares/attachuserid.middleware.js";
 import { verifyJWT } from "../../middlewares/auth.middleware.js";
@@ -32,6 +33,8 @@ router
 router.route("/list").get(verifyJWT, list);
 
 router.route("/list-for-owner").get(verifyJWT, listForOwner);
+
+router.route("/list-for-home").get(listTurfsForHome);
 
 router.route("/:id").get(verifyJWT, getOne);
 

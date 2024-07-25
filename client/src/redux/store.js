@@ -1,19 +1,23 @@
-import { configureStore } from '@reduxjs/toolkit'
-import { combineReducers } from 'redux'
-import { alertSlice } from './alertSlice'
-import { userSlice } from './userSlice'
-import { bookingSlice } from './bookingSlice'
-import { adminSlice } from './adminSlice'
+import { configureStore } from '@reduxjs/toolkit';
+import { combineReducers } from 'redux';
+import authReducer from './slices/auth.slice';
+import turfReducer from './slices/turf.slice';
+import notificationReducer from './slices/notification.slice';
+import locationReducer from './slices/location.slice';
+import { createLogger } from 'redux-logger';
 
 const rootReducer = combineReducers({
-    alerts: alertSlice.reducer,
-    user: userSlice.reducer,
-    booking: bookingSlice.reducer,
-    admin: adminSlice.reducer,
-})
+  auth: authReducer,
+  turf: turfReducer,
+  notification: notificationReducer,
+  location: locationReducer,
+});
+
+const logger = createLogger();
 
 const store = configureStore({
-    reducer: rootReducer,
-})
+  reducer: rootReducer,
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(logger),
+});
 
-export default store
+export default store;

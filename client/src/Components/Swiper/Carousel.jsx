@@ -1,39 +1,34 @@
-import React, { useRef, useState } from 'react';
-// Import Swiper React components
+import React from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
-
-// Import Swiper styles
 import 'swiper/css';
 import 'swiper/css/pagination';
-
 import './styles.css';
+import { Pagination, Autoplay } from 'swiper/modules';
 
-// import required modules
-import { Pagination,Autoplay } from 'swiper/modules';
-function Carousel() {
+const Carousel = ({ images }) => {
   return (
-    <>
-      <Swiper
+    <Swiper
       autoplay={{
         delay: 2500,
         disableOnInteraction: false,
-        }}
-        pagination={{
-          dynamicBullets: true,
-        }}
-        modules={[Pagination,Autoplay]}
-        className="w-full h-1/2"
-      >
-        <SwiperSlide>
-            <img src="https://blog.playo.co/wp-content/uploads/2017/10/football-grounds-in-dubai.jpg" alt="slide image" />
+      }}
+      pagination={{
+        dynamicBullets: true,
+      }}
+      modules={[Pagination, Autoplay]}
+      className="w-full h-[300px]"
+    >
+      {images.map((image, index) => (
+        <SwiperSlide key={index}>
+          <img
+            src={image.src}
+            alt={image.alt || `Slide ${index + 1}`}
+            className="w-full h-full object-cover"
+          />
         </SwiperSlide>
-        <SwiperSlide>
-            <img src="https://images.unsplash.com/photo-1487466365202-1afdb86c764e?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8Zm9vdGJhbGwlMjBncm91bmR8ZW58MHx8MHx8fDA%3D" alt="slide image" />
-        </SwiperSlide>
+      ))}
+    </Swiper>
+  );
+};
 
-      </Swiper>
-    </>
-  )
-}
-
-export default Carousel
+export default Carousel;

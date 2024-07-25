@@ -6,15 +6,20 @@ import User from "../../models/user.model.js";
 import { asyncHandler } from "../../utils/asyncHandler.js";
 import { ApiResponse } from "../../utils/ApiResponse.js";
 import { ApiError } from "../../utils/ApiError.js";
-import { uploadFile } from "../../utils/helper.js";
+import { getTokenExpiry, uploadFile } from "../../utils/helper.js";
 
 // user schema for validation
 const schema = Joi.object({
   email: Joi.string().email().required(),
   password: Joi.string().min(6).max(30).required(),
+  confirmPassword: Joi.string().valid(Joi.ref("password")).optional().messages({
+    "any.only": "Confirm password must match password",
+    "string.empty": "Confirm password is required",
+  }),
   phone: Joi.string().min(8).max(15).required(),
   username: Joi.string().min(3).max(12).required(),
   role: Joi.string().optional(),
+  image: Joi.optional(),
 });
 
 const schemaForSignIn = schema.fork(
@@ -74,23 +79,22 @@ const signUp = asyncHandler(async (req, res) => {
   if (existedUser) {
     throw new ApiError(
       409,
-      "User with email or username or phone number already exists",
       "User with email or username or phone number already exists"
     );
   }
 
   if (role === "admin") {
-    throw new ApiError(
-      403,
-      "Only admin can assign admin role to users",
-      "Only admin can assign admin role to users"
-    );
+    throw new ApiError(403, "Only admin can assign admin role to users");
   }
 
-  const files = req.files;
-  const uploadedImage = await uploadFile(files, "image");
+  const imageFile = req.files[0]?.fieldname;
+  let uploadedImage;
+  if (imageFile) {
+    const files = req.files;
+    uploadedImage = await uploadFile(files, "image");
+  }
 
-  if (!uploadedImage) {
+  if (imageFile && !uploadedImage) {
     throw new ApiError(500, "Error in uploading file");
   }
 
@@ -115,13 +119,7 @@ const signUp = asyncHandler(async (req, res) => {
 
   return res
     .status(201)
-    .json(
-      new ApiResponse(
-        201,
-        createdUser,
-        "User signed up successfully. Account verification email has been sent to your email address."
-      )
-    );
+    .json(new ApiResponse(201, createdUser, "User signed up successfully."));
 });
 
 const signIn = asyncHandler(async (req, res) => {
@@ -156,6 +154,8 @@ const signIn = asyncHandler(async (req, res) => {
     .select("-password -refreshToken")
     .lean();
 
+  const tokenExpiresAt = getTokenExpiry(accessToken);
+
   const options = {
     httpOnly: true,
     secure: true,
@@ -170,11 +170,12 @@ const signIn = asyncHandler(async (req, res) => {
       200,
       {
         user: loggedInUser,
+        tokenExpiresAt,
         // Uncomment below lines if you want to send tokens in the response body for mobile apps or local storage
         // accessToken,
         // refreshToken,
       },
-      "User signed in"
+      "User signed in successfully"
     )
   );
 });
@@ -238,14 +239,24 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     const { accessToken, newRefreshToken: refreshToken } =
       await generateAccessAndRefreshToken(user._id);
 
+    const tokenExpiresAt = getTokenExpiry(accessToken);
+
     return res
       .status(200)
       .cookie("accessToken", accessToken, options)
       .cookie("refreshToken", refreshToken, options)
-      .json(new ApiResponse(200, {}, "Access Token refreshed"));
+      .json(new ApiResponse(200, { tokenExpiresAt }, "Access Token refreshed"));
   } catch (error) {
     throw new ApiError(401, error?.message || "Invalid refresh token");
   }
 });
 
-export { signUp, signIn, signOut, refreshAccessToken };
+const protectedRoute = asyncHandler(async (req, res) => {
+  res
+    .status(200)
+    .json(
+      new ApiResponse(200, { user: req.user }, "Access to protected routes")
+    );
+});
+
+export { signUp, signIn, signOut, refreshAccessToken, protectedRoute };
