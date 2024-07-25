@@ -13,7 +13,6 @@ import { useLocation } from 'react-router-dom';
 function App() {
   axios.defaults.baseURL = process.env.REACT_APP_API;
   axios.defaults.withCredentials = true;
-  const { loading } = useSelector((state) => state.alerts);
   const { loading: userLoading, isAuthenticated, user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const location = useLocation();
@@ -31,7 +30,8 @@ function App() {
     <>
       <Toaster position="top-center" reverseOrder={false} />
 
-      {loading && <Loader />}
+      {/* //TODO: Replace with loading form app slice */}
+      {userLoading && <Loader />}
 
       <ScrollToTop
         className="z-20"

@@ -1,6 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { combineReducers } from 'redux';
-import alertReducer from './alertSlice';
 import authReducer from './slices/auth.slice';
 import turfReducer from './slices/turf.slice';
 import notificationReducer from './slices/notification.slice';
@@ -12,7 +11,6 @@ const rootReducer = combineReducers({
   turf: turfReducer,
   notification: notificationReducer,
   location: locationReducer,
-  alerts: alertReducer,
 });
 
 const logger = createLogger();
