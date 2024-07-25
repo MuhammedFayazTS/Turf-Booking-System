@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Grid, GridItem } from '@chakra-ui/react';
 import Carousel from '../Swiper/Carousel';
@@ -9,7 +8,7 @@ import TurfCard from '../content/card/TurfCard';
 import TurfCardHorizontal from '../content/card/TurfCardHorizontal';
 import { LocationPopover } from '../content/popover/LocationPopover';
 import { getUserLocation } from '../../Utils/location.helper';
-import { setLocation } from '../../redux/slices/auth.slice';
+import { clearDistances, getDistanceToTurfs, setLocation } from '../../redux/slices/location.slice';
 import { listTurfs } from '../../redux/slices/turf.slice';
 import Breadcrumbs from '../content/breadcrumbs/Breadcrumbs';
 import TurfListHeader from '../content/headers/TurfListHeader';
@@ -37,7 +36,7 @@ const breadcrumbItems = [
 const TurfList = () => {
   const dispatch = useDispatch();
   const { loading, turfs } = useSelector((state) => state.turf);
-  const { location } = useSelector((state) => state.auth);
+  const { location, distances } = useSelector((state) => state.location);
   const [gridListing, setGridListing] = useState(true);
   const [filterApplied, setFilterApplied] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -66,6 +65,14 @@ const TurfList = () => {
     }
     dispatch(listTurfs({ location: location?.name }));
   }, [dispatch, location?.name]);
+
+  useEffect(() => {
+    if (turfs?.turfs?.length > 0 && location?.name !== 'all') {
+      dispatch(getDistanceToTurfs());
+    }else{
+      dispatch(clearDistances())
+    }
+  }, [dispatch, location?.name, turfs?.turfs?.length]);
 
   const onChangeLocation = useCallback(() => {
     setFilterState((prev) =>
@@ -116,14 +123,14 @@ const TurfList = () => {
           setFilterState={setFilterState}
         />
         {(!turfs?.turfs || turfs?.turfs?.length === 0) && <NotFoundFallback message={'We can&apos;t find any turfs'} />}
-        <TurfGrid turfs={turfs.turfs} gridListing={gridListing} loading={loading} />
+        <TurfGrid turfs={turfs.turfs} gridListing={gridListing} loading={loading} distances={distances} />
         <Pagination currentPage={currentPage} onPageChange={handlePageChange} totalPages={turfs.totalPages} />
       </div>
     </div>
   );
 };
 
-const TurfGrid = ({ turfs, gridListing, loading = false }) => (
+const TurfGrid = ({ turfs, gridListing, loading = false, distances }) => (
   <Grid
     templateColumns={gridListing ? { base: 'repeat(1, 1fr)', md: 'repeat(4, 1fr)' } : 'repeat(1, 1fr)'}
     w="92%"
@@ -139,7 +146,11 @@ const TurfGrid = ({ turfs, gridListing, loading = false }) => (
     {turfs?.length > 0 &&
       turfs?.map((turf, index) => (
         <GridItem key={turf._id} w="100%">
-          {gridListing ? <TurfCard data={turf} /> : <TurfCardHorizontal data={turf} />}
+          {gridListing ? (
+            <TurfCard data={turf} distance={distances[turf._id]} />
+          ) : (
+            <TurfCardHorizontal data={turf} distance={distances[turf._id]} />
+          )}
         </GridItem>
       ))}
   </Grid>

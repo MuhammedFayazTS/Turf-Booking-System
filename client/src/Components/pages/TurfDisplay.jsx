@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import Header from '../core/Header/Header';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { EmailIcon, PhoneIcon } from '@chakra-ui/icons';
@@ -13,21 +13,42 @@ import NotFoundFallback from '../content/fallback/NotFoundFallback';
 import PriceDisplaySlider from '../content/carousel/PriceDisplaySlider';
 import Reviews from '../content/review_and_rating/Reviews';
 import RatingWrapper from '../content/review_and_rating/RatingWrapper';
+import { getDistanceToTurf } from '../../redux/slices/location.slice';
 
 function TurfDisplay() {
   const navigation = useNavigate();
   const dispatch = useDispatch();
   const { id } = useParams();
   const { turfDetails, loading } = useSelector((state) => state.turf);
+  const { location, loading: locationLoading, distanceToTurf } = useSelector((state) => state.location);
 
   // for adding it to bookings list
   const addToBookingPage = () => {
     navigation(`/cart/${id}`);
   };
 
+  const calculateDistance = useCallback(async () => {
+    if (!turfDetails || !turfDetails.location || !location) {
+      return;
+    }
+
+    const origin = location;
+    const { coordinates: destination } = turfDetails.location;
+
+    if (!origin || !destination) {
+      return;
+    }
+
+    await dispatch(getDistanceToTurf({ origin, destination }));
+  }, [dispatch, location, turfDetails]);
+
   useEffect(() => {
     dispatch(getTurfDetails(id));
   }, [dispatch, id]);
+
+  useEffect(() => {
+    calculateDistance();
+  }, [calculateDistance, dispatch, id]);
 
   return (
     <>
@@ -35,12 +56,10 @@ function TurfDisplay() {
         <Header pos={'sticky'} />
         <ShortCarousel images={turfDetails?.images} />
 
-        {loading || !turfDetails ? (
-          !loading && !turfDetails ? (
-            <NotFoundFallback message={'We can&apos;t find the turf'} />
-          ) : (
-            <Loader />
-          )
+        {loading ? (
+          <Loader />
+        ) : !turfDetails ? (
+          <NotFoundFallback message={'We can&apos;t find the turf'} />
         ) : (
           <div className="flex flex-col items-center mt-5 py-5 space-y-2">
             <div className="w-11/12  p-3 flex">
@@ -81,19 +100,25 @@ function TurfDisplay() {
             <Divider width={'85%'} borderWidth={'1px'} />
 
             <div className="flex flex-col md:flex-row md:w-11/12 p-3 justify-between">
-              <motion.h4
-                initial={{ x: -50 }}
-                whileInView={{ x: 0 }}
-                transition={{ duration: 0.3, type: 'tween' }}
-                viewport={{ once: true }}
-                className="text-md md:text-lg "
-              >
-                {/*TODO: add a field in turfs to make it indoor or outdoor  */}
-                Venue type: <span className="text-emerald-600">Indoor</span>
-              </motion.h4>
+              {locationLoading ? (
+                <span className="w-full h-8 rounded bg-gray-100 text-gray-100">Loading...</span>
+              ) : (
+                <motion.p
+                  initial={{ x: -50 }}
+                  whileInView={{ x: 0 }}
+                  transition={{ duration: 0.3, type: 'tween' }}
+                  viewport={{ once: true }}
+                  className="text-md md:text-lg "
+                >
+                  {/*TODO: add a field in turfs to make it indoor or outdoor  */}
+                  {/* Venue type: <span className="text-emerald-600">Indoor</span> */}
+                  Distance to Turf: <span className="text-emerald-600 mr-3">{distanceToTurf?.distance?.text}</span>
+                  Estimated Travel Time: <span className="text-emerald-600">{distanceToTurf?.duration?.text}</span>
+                </motion.p>
+              )}
               <motion.h3
-                initial={{ x: 50 }}
-                whileInView={{ x: 0 }}
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
                 transition={{ duration: 0.3, type: 'tween' }}
                 viewport={{ once: true }}
                 className="text-md md:text-lg "

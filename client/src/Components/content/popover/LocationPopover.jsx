@@ -16,13 +16,13 @@ import {
   Tooltip,
 } from '@chakra-ui/react';
 import { MapPinIcon } from '@heroicons/react/24/solid';
-import { setLocation } from '../../../redux/slices/auth.slice';
+import { setLocation } from '../../../redux/slices/location.slice';
 import { getUserLocation } from '../../../Utils/location.helper';
 const currentLocationIcon = 'assets/images/svg/current-location-svgrepo-com.svg';
 
 export const LocationPopover = () => {
   const dispatch = useDispatch();
-  const location = useSelector((state) => state.auth.location);
+  const {location} = useSelector((state) => state.location);
   const [isOpen, setIsOpen] = useState(false);
   const [locationText, setLocationText] = useState('');
 

@@ -5,7 +5,6 @@ import { handleApiResponse } from '../../Utils/toast.helper';
 const initialState = {
   loading: false,
   user: null,
-  location: null,
   token: null,
   isAuthenticated: false,
   error: '',
@@ -94,16 +93,6 @@ const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    setLocation: (state, action) => {
-      state.location = action.payload;
-    },
-    updateLocation: (state, action) => {
-      if (state.location) {
-        state.location = { ...state.location, ...action.payload };
-      } else {
-        state.location = action.payload;
-      }
-    },
     setAuthLoading: (state) => {
       state.loading = true;
     },
@@ -203,5 +192,5 @@ const authSlice = createSlice({
 });
 
 export { signUp, signIn, loadUser, refreshToken, signOut, protectedRoute };
-export const { setLocation, updateLocation, setAuthLoading } = authSlice.actions;
+export const { setAuthLoading } = authSlice.actions;
 export default authSlice.reducer;

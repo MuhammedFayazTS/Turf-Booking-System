@@ -17,13 +17,13 @@ import { listTurfsForHome } from '../redux/slices/turf.slice';
 import TurfCard from '../Components/content/card/TurfCard';
 import FeatureCard from '../Components/content/card/FeatureCard';
 import { getUserLocation } from '../Utils/location.helper';
-import { setLocation } from '../redux/slices/auth.slice';
+import { setLocation } from '../redux/slices/location.slice';
 
 function LandingPage() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { turfsForHome, loading } = useSelector((state) => state.turf);
-  const { location } = useSelector((state) => state.auth);
+  const { location } = useSelector((state) => state.location);
 
   const renderFeatureCards = () => {
     return Features.map((feature) => <FeatureCard key={feature.title} feature={feature} />);

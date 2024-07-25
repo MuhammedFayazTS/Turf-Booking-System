@@ -11,11 +11,11 @@ const Links = [
 const services = [
   {
     service: 'Book Turf',
-    to: '/venue-list',
+    to: '/turf-list',
   },
   {
     service: 'List Your Turf',
-    to: '/organizer-register',
+    to: '/turf-register',
   },
 ];
 

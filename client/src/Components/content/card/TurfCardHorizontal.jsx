@@ -1,4 +1,4 @@
-import { Button, Card, CardBody, CardFooter, Heading, Image, Stack, Text } from '@chakra-ui/react';
+import { Badge, Button, Card, CardBody, CardFooter, Heading, Image, Stack, Text, Tooltip } from '@chakra-ui/react';
 import { CalendarDaysIcon } from '@heroicons/react/24/outline';
 import { MapPinIcon } from '@heroicons/react/24/solid';
 import { motion } from 'framer-motion';
@@ -8,7 +8,7 @@ import DisplayStarRating from '../review_and_rating/DisplayStarRating';
 
 const defaultImage = 'https://placehold.co/800@3x.png';
 
-function TurfCardHorizontal({ data }) {
+function TurfCardHorizontal({ data,distance }) {
   const navigate = useNavigate();
 
   const handleBooking = () => {
@@ -56,6 +56,12 @@ function TurfCardHorizontal({ data }) {
             <MapPinIcon className="h-5 w-5" />
             {data.location?.name}
           </Text>
+
+          {distance && (
+              <Badge p={1} w={'fit-content'} variant="subtle" colorScheme="green">
+                {distance} away from you
+              </Badge>
+          )}
         </CardBody>
 
         <CardFooter>

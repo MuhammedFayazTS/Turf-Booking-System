@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, CardBody, CardFooter, Image, Stack, Heading, Text, Button } from '@chakra-ui/react';
+import { Card, CardBody, CardFooter, Image, Stack, Heading, Text, Button, Badge, Tooltip } from '@chakra-ui/react';
 import { MapPinIcon } from '@heroicons/react/24/solid';
 import { CalendarDaysIcon } from '@heroicons/react/24/outline';
 import { useNavigate } from 'react-router-dom';
@@ -8,7 +8,7 @@ import DisplayStarRating from '../review_and_rating/DisplayStarRating';
 
 const defaultImage = 'https://placehold.co/800@3x.png';
 
-function TurfCard({ data }) {
+function TurfCard({ data, distance }) {
   const navigate = useNavigate();
 
   const handleBooking = () => {
@@ -38,14 +38,24 @@ function TurfCard({ data }) {
           borderRadius={{ base: 'none', md: 'lg' }}
         />
         <Stack p={{ md: 0, base: '18px' }} mt="4" spacing="3" flexGrow={1}>
-          <div className="flex space-x-2 items-center">
-            {data?.rating?.stars && (
-              <div className="bg-amber-500 w-8 text-white p-1.5 rounded-md text-sm font-medium flex justify-center">
-                {data?.rating?.stars?.toFixed(1)}
-              </div>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              {data?.rating?.stars && (
+                <div className="bg-amber-500 w-8 text-white p-1.5 rounded-md text-sm font-medium flex justify-center">
+                  {data?.rating?.stars?.toFixed(1)}
+                </div>
+              )}
+              <DisplayStarRating rating={data?.rating?.stars} />
+              <p className="text-gray-600 text-md">{data?.rating?.count || 0} Reviews</p>
+            </div>
+
+            {distance && (
+              <Tooltip label={`${distance} away from you.`}>
+                <Badge variant="subtle" colorScheme="green">
+                  {distance}
+                </Badge>
+              </Tooltip>
             )}
-            <DisplayStarRating rating={data?.rating?.stars} />
-            <p className="text-gray-600 text-md">{data?.rating?.count || 0} Reviews</p>
           </div>
           <Heading size="md">{data.name}</Heading>
           <Text color="green.600" fontWeight="bold" fontSize="lg">
