@@ -19,12 +19,12 @@ function App() {
 
   useAxiosInterceptors();
 
-  useEffect(() => {
-    const paths = ['/sign-in', '/sign-up'];
-    if (!userLoading && !paths.includes(location.pathname) && (!isAuthenticated || !user)) {
-      dispatch(loadUser());
-    }
-  }, [dispatch, isAuthenticated, userLoading, user, location]);
+  // useEffect(() => {
+  //   const paths = ['/sign-in', '/sign-up'];
+  //   if (!userLoading && !paths.includes(location.pathname) && (!isAuthenticated || !user)) {
+  //     dispatch(loadUser());
+  //   }
+  // }, [dispatch, isAuthenticated, userLoading, user, location]);
 
   return (
     <>
