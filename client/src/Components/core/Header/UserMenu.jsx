@@ -27,7 +27,7 @@ const UserMenu = ({ user, handleSignOut,notifications }) => {
         <Portal>
           <MenuList zIndex={30}>
             <MenuGroup title="Profile">
-              <MenuItem as={Link} to="/my-profile">
+              <MenuItem as={Link} to="/profile">
                 My Profile
               </MenuItem>
               {user?.role === 'user' && (

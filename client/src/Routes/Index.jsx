@@ -1,14 +1,16 @@
-import React, { lazy, Suspense, useEffect } from 'react';
+import React, { lazy, Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import ProtectedRoute from './ProtectedRoute';
 import PublicRoute from './PublicRoute';
 import Loader from '../Components/core/loader/Loader';
 // Lazy-loaded components
-const LandingPage = lazy(() => import('../Pages/LandingPage'));
+const LandingPage = lazy(() => import('../Components/pages/LandingPage'));
 const SignUp = lazy(() => import('../Components/pages/SignUp'));
 const SignIn = lazy(() => import('../Components/pages/SignIn'));
 const TurfList = lazy(() => import('../Components/pages/TurfList'));
 const TurfDisplay = lazy(() => import('../Components/pages/TurfDisplay'));
+const MyProfile = lazy(() => import('../Components/pages/MyProfile'));
+const EditProfile = lazy(() => import('../Components/pages/EditProfile'));
 const PageNotFound = lazy(() => import('../Components/pages/PageNotFound'));
 
 // Routes component
@@ -27,6 +29,9 @@ const Index = () => {
         <Route element={<ProtectedRoute />}>
           <Route path="/turf-list" element={<TurfList />} />
           <Route path="/turf/:id" element={<TurfDisplay />} />
+          <Route path="/profile" element={<MyProfile />}>
+            <Route index element={<EditProfile />} />
+          </Route>
         </Route>
         {/* page not found */}
         <Route path="*" element={<PageNotFound />} />
