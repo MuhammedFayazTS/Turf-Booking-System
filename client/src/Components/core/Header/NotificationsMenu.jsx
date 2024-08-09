@@ -43,7 +43,10 @@ const NotificationsMenu = ({ notifications }) => {
                   {getNotificationIcon(notification.type)}
                   <div className="ml-2">
                     <p className="text-sm font-medium">{notification.title}</p>
-                    <p className="text-sm text-gray-500" style={{ maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <p
+                      className="text-sm text-gray-500"
+                      style={{ maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+                    >
                       {notification.message}
                     </p>
                   </div>
@@ -52,7 +55,7 @@ const NotificationsMenu = ({ notifications }) => {
             ))}
           </MenuGroup>
           <Center py={2}>
-            <Button as={Link} variant="link" size={'sm'} to={'/notifications'}>
+            <Button as={Link} variant="link" size={'sm'} to={'/profile/notifications'}>
               View more
             </Button>
           </Center>

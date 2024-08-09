@@ -11,6 +11,7 @@ const TurfList = lazy(() => import('../Components/pages/TurfList'));
 const TurfDisplay = lazy(() => import('../Components/pages/TurfDisplay'));
 const MyProfile = lazy(() => import('../Components/pages/MyProfile'));
 const EditProfile = lazy(() => import('../Components/pages/EditProfile'));
+const Notifications = lazy(() => import('../Components/pages/Notifications'));
 const PageNotFound = lazy(() => import('../Components/pages/PageNotFound'));
 
 // Routes component
@@ -31,6 +32,7 @@ const Index = () => {
           <Route path="/turf/:id" element={<TurfDisplay />} />
           <Route path="/profile" element={<MyProfile />}>
             <Route index element={<EditProfile />} />
+            <Route path='notifications' element={<Notifications />} />
           </Route>
         </Route>
         {/* page not found */}

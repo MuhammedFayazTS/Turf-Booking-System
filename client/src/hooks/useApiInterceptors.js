@@ -1,13 +1,11 @@
 import axios from 'axios';
 import moment from 'moment';
 import store from '../redux/store';
-import { loadUser, refreshToken, logout, signOut } from '../redux/slices/auth.slice';
-import { useNavigate } from 'react-router-dom';
+import { loadUser, refreshToken, signOut } from '../redux/slices/auth.slice';
 import { useDispatch } from 'react-redux';
 import toast from 'react-hot-toast';
 
 const useAxiosInterceptors = () => {
-  const navigate = useNavigate();
   const dispatch = useDispatch();
 
   // Request interceptor
@@ -32,8 +30,11 @@ const useAxiosInterceptors = () => {
           req.headers.Authorization = `Bearer ${updatedToken}`;
           dispatch(loadUser());
         } else {
+          if (!store.getState.auth.signedIn) {
+            return;
+          }
           toast.error('Session expired, please sign in again');
-          dispatch(signOut());
+          await dispatch(signOut());
           return Promise.reject(new Error('Session expired'));
         }
       } else {
@@ -66,13 +67,13 @@ const useAxiosInterceptors = () => {
             return axios(originalRequest);
           } else {
             toast.error('Session expired, please sign in again');
-            dispatch(signOut());
+            await dispatch(signOut());
             return Promise.reject(new Error('Session expired'));
           }
         } catch (refreshError) {
           console.error('Refresh token failed:', refreshError);
           toast.error('Session expired, please sign in again');
-          dispatch(signOut());
+          await dispatch(signOut());
           return Promise.reject(refreshError);
         }
       }

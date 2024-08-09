@@ -146,6 +146,7 @@ const authSlice = createSlice({
         state.user = action.payload.data.user;
         state.token = action.payload.token;
         state.isAuthenticated = true;
+        state.signedIn = true;
         state.error = '';
         localStorage.setItem('tokenExpiresAt', action.payload.data.tokenExpiresAt);
       })
@@ -194,6 +195,7 @@ const authSlice = createSlice({
         state.user = null;
         state.token = null;
         state.isAuthenticated = false;
+        state.signedIn = false;
         state.error = '';
       })
       .addCase(signOut.rejected, (state, action) => {
