@@ -16,6 +16,8 @@ import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
 import { useDispatch, useSelector } from 'react-redux';
 import TextField from '../Forms/Formik Components/TextField';
+import FileUploaderModal from '../content/modal/FileUploaderModal';
+import { updateProfileImage, updateUserDetails } from '../../redux/slices/auth.slice';
 
 const validationSchema = Yup.object({
   username: Yup.string().max(10, 'Must be 10 characters or less').required('Username is Required'),
@@ -26,14 +28,11 @@ function EditProfile() {
   const [profilePic, setProfilePic] = useState('');
   const { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
-  const toast = useToast();
   const fileInputRef = useRef(null);
 
   useEffect(() => {
     setProfilePic(user?.image || '');
   }, [user]);
-
-  const handleButtonClick = () => fileInputRef.current?.click();
 
   const handleChangeImage = (e) => {
     if (e.target.files?.[0]) {
@@ -42,12 +41,19 @@ function EditProfile() {
   };
 
   const handleSubmit = async (values) => {
-    console.log('Values: ', values);
+    await dispatch(updateUserDetails(values))
   };
 
   if (!user) {
     return <div>Loading your data...</div>;
   }
+
+  const handleFileUpload = async (values) => {
+    const image = values?.image;
+    const formData = new FormData();
+    formData.append('image', image);
+    await dispatch(updateProfileImage(formData));
+  };
 
   return (
     <div className="p-4 md:p-8">
@@ -82,9 +88,14 @@ function EditProfile() {
                   }
                 />
                 <FormLabel>
-                  <Button colorScheme="blackAlpha" variant="ghost" onClick={handleButtonClick}>
-                    Change Image
-                  </Button>
+                  <FileUploaderModal
+                    buttonText="Change Image"
+                    colorScheme="blackAlpha"
+                    variant="ghost"
+                    title={'Change Image'}
+                    isRound
+                    onUpload={handleFileUpload}
+                  />
                   <Input
                     type="file"
                     accept="image/png, image/jpg, image/jpeg"
@@ -146,7 +157,7 @@ function EditProfile() {
                   <Button type="submit" colorScheme="green">
                     Update
                   </Button>
-                  <Button type="reset" colorScheme="Gray">
+                  <Button type="reset">
                     Reset
                   </Button>
                 </ButtonGroup>

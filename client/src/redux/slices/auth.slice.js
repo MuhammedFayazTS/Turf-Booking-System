@@ -89,6 +89,32 @@ const protectedRoute = createAsyncThunk('auth/protected', async (_, { rejectWith
   }
 });
 
+const updateProfileImage = createAsyncThunk('auth/updateProfileImage', async (image, { rejectWithValue }) => {
+  try {
+    const response = await axios.put('/user/change-image', image, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    handleApiResponse(response, 'Profile image updated successfully');
+    return response.data;
+  } catch (error) {
+    handleApiResponse(error.response, '', 'Profile image updation failed');
+    return rejectWithValue(error.response.data);
+  }
+});
+
+const updateUserDetails = createAsyncThunk('auth/updateUserDetails', async (userDetails, { rejectWithValue }) => {
+  try {
+    const response = await axios.put('/user', userDetails);
+    handleApiResponse(response, 'User details updated successfully');
+    return response.data;
+  } catch (error) {
+    handleApiResponse(error.response, '', 'User details updation failed');
+    return rejectWithValue(error.response.data);
+  }
+});
+
 const authSlice = createSlice({
   name: 'auth',
   initialState,
@@ -187,10 +213,34 @@ const authSlice = createSlice({
         state.loading = false;
         state.isAuthenticated = false;
         state.error = action.payload ? action.payload.message : action.error.message;
+      })
+      .addCase(updateProfileImage.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(updateProfileImage.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload.data;
+        state.error = '';
+      })
+      .addCase(updateProfileImage.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload ? action.payload.message : action.error.message;
+      })
+      .addCase(updateUserDetails.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(updateUserDetails.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload.data;
+        state.error = '';
+      })
+      .addCase(updateUserDetails.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload ? action.payload.message : action.error.message;
       });
   },
 });
 
-export { signUp, signIn, loadUser, refreshToken, signOut, protectedRoute };
+export { signUp, signIn, loadUser, refreshToken, signOut, protectedRoute, updateProfileImage, updateUserDetails };
 export const { setAuthLoading } = authSlice.actions;
 export default authSlice.reducer;

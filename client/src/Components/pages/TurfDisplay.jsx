@@ -50,11 +50,19 @@ function TurfDisplay() {
     calculateDistance();
   }, [calculateDistance, dispatch, id]);
 
+  const setTurfImages = () => {
+    let images = turfDetails?.images;
+    if (images?.length < 3) {
+      images = [...images, ...images];
+    }
+    return images;
+  };
+
   return (
     <>
       <div className="bg-slate-50">
         <Header pos={'sticky'} />
-        <ShortCarousel images={turfDetails?.images} />
+        <ShortCarousel images={setTurfImages()} />
 
         {loading ? (
           <Loader />
