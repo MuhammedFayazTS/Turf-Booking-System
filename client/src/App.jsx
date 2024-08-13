@@ -20,11 +20,13 @@ function App() {
   useAxiosInterceptors();
 
   useEffect(() => {
-    const paths = ['/sign-in', '/sign-up'];
-    if (!userLoading && !paths.includes(location.pathname) && (!isAuthenticated || !user)) {
+    const publicPaths = ['/sign-in', '/sign-up'];
+
+    if (!isAuthenticated && !publicPaths.includes(location.pathname) && !userLoading) {
       dispatch(loadUser());
     }
-  }, [dispatch, isAuthenticated, userLoading, user, location]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, isAuthenticated, location.pathname]);
 
   return (
     <>

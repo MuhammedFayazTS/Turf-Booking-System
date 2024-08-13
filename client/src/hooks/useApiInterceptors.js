@@ -8,10 +8,16 @@ import toast from 'react-hot-toast';
 const useAxiosInterceptors = () => {
   const dispatch = useDispatch();
 
+  // Define your public routes
+  const publicRoutes = ['/sign-in', '/sign-up', '/'];
+
   // Request interceptor
   axios.interceptors.request.use(
     async (req) => {
-      if (req?.url?.includes('auth')) return req;
+      // Check if the request URL is a public route
+      if (publicRoutes.some(route => req.url.includes(route))) {
+        return req;
+      }
 
       const tokenExpiry = localStorage.getItem('tokenExpiresAt');
       const tokenExpiresAt = moment(tokenExpiry ? new Date(tokenExpiry) : new Date());
@@ -30,9 +36,6 @@ const useAxiosInterceptors = () => {
           req.headers.Authorization = `Bearer ${updatedToken}`;
           dispatch(loadUser());
         } else {
-          if (!store.getState.auth.signedIn) {
-            return;
-          }
           toast.error('Session expired, please sign in again');
           await dispatch(signOut());
           return Promise.reject(new Error('Session expired'));
@@ -56,9 +59,13 @@ const useAxiosInterceptors = () => {
     async (error) => {
       const originalRequest = error.config;
 
+      // Skip handling for public routes
+      if (publicRoutes.some(route => originalRequest.url.includes(route))) {
+        return Promise.reject(error);
+      }
+
       if (error.response?.status === 401 && error.response.data?.message === 'Unauthorized - Invalid token') {
         try {
-          // Attempt to refresh the token
           const refreshResponse = await dispatch(refreshToken());
 
           if (refreshToken.fulfilled.match(refreshResponse)) {
@@ -71,7 +78,6 @@ const useAxiosInterceptors = () => {
             return Promise.reject(new Error('Session expired'));
           }
         } catch (refreshError) {
-          console.error('Refresh token failed:', refreshError);
           toast.error('Session expired, please sign in again');
           await dispatch(signOut());
           return Promise.reject(refreshError);

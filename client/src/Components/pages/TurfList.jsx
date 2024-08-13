@@ -130,30 +130,35 @@ const TurfList = () => {
   );
 };
 
-const TurfGrid = ({ turfs, gridListing, loading = false, distances }) => (
-  <Grid
-    templateColumns={gridListing ? { base: 'repeat(1, 1fr)', md: 'repeat(4, 1fr)' } : 'repeat(1, 1fr)'}
-    w="92%"
-    gap={6}
-  >
-    {loading &&
-      Array.from({ length: 4 })?.map((_, index) => (
-        <GridItem key={index} w="100%">
-          {gridListing ? <LoadingTurfCard /> : <LoadingTurfCardHorizontal />}
-        </GridItem>
-      ))}
+const TurfGrid = ({ turfs = [], gridListing = true, loading = false, distances = {} }) => {
+  const safeDistances = distances || {};
 
-    {turfs?.length > 0 &&
-      turfs?.map((turf, index) => (
-        <GridItem key={turf._id} w="100%">
-          {gridListing ? (
-            <TurfCard data={turf} distance={distances[turf._id]} />
-          ) : (
-            <TurfCardHorizontal data={turf} distance={distances[turf._id]} />
-          )}
-        </GridItem>
-      ))}
-  </Grid>
-);
+  return (
+    <Grid
+      templateColumns={gridListing ? { base: 'repeat(1, 1fr)', md: 'repeat(4, 1fr)' } : 'repeat(1, 1fr)'}
+      w="92%"
+      gap={6}
+    >
+      {loading &&
+        Array.from({ length: 4 }).map((_, index) => (
+          <GridItem key={index} w="100%">
+            {gridListing ? <LoadingTurfCard /> : <LoadingTurfCardHorizontal />}
+          </GridItem>
+        ))}
+
+      {turfs.length > 0 &&
+        turfs.map((turf) => (
+          <GridItem key={turf._id} w="100%">
+            {gridListing ? (
+              <TurfCard data={turf} distance={safeDistances[turf._id] || 'N/A'} />
+            ) : (
+              <TurfCardHorizontal data={turf} distance={safeDistances[turf._id] || 'N/A'} />
+            )}
+          </GridItem>
+        ))}
+    </Grid>
+  );
+};
+
 
 export default TurfList;
