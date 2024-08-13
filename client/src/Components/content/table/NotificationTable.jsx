@@ -23,12 +23,13 @@ import {
   ShieldExclamationIcon,
   TrashIcon,
 } from '@heroicons/react/24/solid';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 
 const NotificationTable = ({ notifications, noNotificationsMessage, markAllAsRead, deleteAll, loading = false }) => {
   const showActions = useBreakpointValue({ base: false, md: true });
   const [selected, setSelected] = useState(new Set());
+  const navigate = useNavigate();
 
   if (loading) {
     return <p className="text-center text-gray-500">Loading notifications...</p>;
@@ -96,8 +97,8 @@ const NotificationTable = ({ notifications, noNotificationsMessage, markAllAsRea
     });
   };
 
-  const handleRowClick = (e) => {
-    console.log('Notification clicked');
+  const handleRowClick = (id) => {
+    navigate(`/profile/notification/${id}`);
   };
 
   return (
@@ -137,7 +138,7 @@ const NotificationTable = ({ notifications, noNotificationsMessage, markAllAsRea
               whileHover={{ background: '#E2E8F0' }}
               transition={{ duration: 0.2, type: 'tween' }}
               className="cursor-pointer"
-              onClick={handleRowClick} // Handle row click
+              onClick={() => handleRowClick(notification?._id)}
             >
               <Td onClick={(e) => e.stopPropagation()} fontWeight="semibold">
                 <Checkbox

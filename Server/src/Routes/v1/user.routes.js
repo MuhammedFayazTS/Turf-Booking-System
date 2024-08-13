@@ -15,6 +15,7 @@ import {
   updateUserImage,
   destroy,
   getUnseenNotifications,
+  getNotificationDetails,
 } from "../../Controllers/v1/user.controller.js";
 import { upload } from "../../middlewares/multer.middleware.js";
 
@@ -22,6 +23,7 @@ import { upload } from "../../middlewares/multer.middleware.js";
 router.route("/role/:id").put(verifyJWT, attachUserId, changeUserRole);
 router.route("/list").get(verifyJWT, list);
 router.route("/notification/unseen").get(verifyJWT, getUnseenNotifications);
+router.route("/notification/:id").get(verifyJWT, getNotificationDetails);
 router.route("/").get(verifyJWT, getLoggedInUser);
 router.route("/change-password").put(verifyJWT, changeUserPassword);
 router.route("/change-image").put(verifyJWT, upload.any(), updateUserImage);

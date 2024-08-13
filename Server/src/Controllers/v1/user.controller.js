@@ -288,6 +288,31 @@ const getUnseenNotifications = asyncHandler(async (req, res) => {
     );
 });
 
+const getNotificationDetails = asyncHandler(async (req, res) => {
+  const id = req.params.id;
+
+  if (!id) {
+    throw new ApiError(400, "Notification ID is required");
+  }
+
+  const notification = await Notification.findOne({
+    userId: req.user._id,
+    _id: id,
+  });
+  if (!notification) {
+    return res.status(404, new ApiResponse(404, [], "Notification not found"));
+  }
+  res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        { notification },
+        "Nodtifiction details loaded successfully"
+      )
+    );
+});
+
 export {
   changeUserRole,
   list,
@@ -298,4 +323,5 @@ export {
   updateUserImage,
   destroy,
   getUnseenNotifications,
+  getNotificationDetails,
 };
