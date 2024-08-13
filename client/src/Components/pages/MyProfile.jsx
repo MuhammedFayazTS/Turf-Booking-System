@@ -1,6 +1,6 @@
 import React from 'react';
 import { Avatar, Grid, GridItem } from '@chakra-ui/react';
-import { BellIcon, BookmarkIcon, PencilIcon } from '@heroicons/react/24/outline';
+import { BellIcon, BookmarkIcon, PencilIcon, LockClosedIcon } from '@heroicons/react/24/outline';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { motion } from 'framer-motion';
@@ -41,11 +41,7 @@ function MyProfile() {
             <h3 className="mt-5 text-xl font-semibold">{user?.username}</h3>
             <h6 className="mb-5 text-sm">{user?.email}</h6>
 
-            <LinkButton
-              to="/profile"
-              icon={PencilIcon}
-              isActive={location.pathname === '/profile'}
-            >
+            <LinkButton to="/profile" icon={PencilIcon} isActive={location.pathname === '/profile'}>
               Edit Profile
             </LinkButton>
 
@@ -63,6 +59,14 @@ function MyProfile() {
               isActive={location.pathname === '/profile/notifications'}
             >
               Notifications
+            </LinkButton>
+
+            <LinkButton
+              to="/profile/security"
+              icon={LockClosedIcon}
+              isActive={location.pathname === '/profile/security'}
+            >
+              Security
             </LinkButton>
           </GridItem>
 

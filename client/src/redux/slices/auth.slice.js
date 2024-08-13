@@ -115,6 +115,17 @@ const updateUserDetails = createAsyncThunk('auth/updateUserDetails', async (user
   }
 });
 
+const changeUserPassword = createAsyncThunk('auth/changeUserPassword', async (userDetails, { rejectWithValue }) => {
+  try {
+    const response = await axios.put('/user/change-password', userDetails);
+    handleApiResponse(response, 'User password updated successfully');
+    return response.data;
+  } catch (error) {
+    handleApiResponse(error.response, '', 'User password updation failed');
+    return rejectWithValue(error.response.data);
+  }
+});
+
 const authSlice = createSlice({
   name: 'auth',
   initialState,
@@ -239,10 +250,31 @@ const authSlice = createSlice({
       .addCase(updateUserDetails.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload ? action.payload.message : action.error.message;
+      })
+      .addCase(changeUserPassword.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(changeUserPassword.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = '';
+      })
+      .addCase(changeUserPassword.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload ? action.payload.message : action.error.message;
       });
   },
 });
 
-export { signUp, signIn, loadUser, refreshToken, signOut, protectedRoute, updateProfileImage, updateUserDetails };
+export {
+  signUp,
+  signIn,
+  loadUser,
+  refreshToken,
+  signOut,
+  protectedRoute,
+  updateProfileImage,
+  updateUserDetails,
+  changeUserPassword,
+};
 export const { setAuthLoading } = authSlice.actions;
 export default authSlice.reducer;
