@@ -24,6 +24,7 @@
     "react-animated-numbers": "^0.17.1",
     "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.2.0",
+    "react-helmet": "^6.1.0",
     "react-hot-toast": "^2.4.1",
     "react-lottie-player": "^1.5.5",
     "react-pro-sidebar": "^1.1.0-alpha.1",

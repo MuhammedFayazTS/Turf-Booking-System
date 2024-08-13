@@ -118,7 +118,6 @@ const NotificationTable = ({ notifications, noNotificationsMessage, markAllAsRea
         </div>
       )}
       <Table variant="simple">
-        <TableCaption>Notifications</TableCaption>
         <Thead>
           <Tr>
             <Th w="5%">
