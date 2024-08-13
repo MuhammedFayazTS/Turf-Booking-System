@@ -288,6 +288,19 @@ const getUnseenNotifications = asyncHandler(async (req, res) => {
     );
 });
 
+const getSeenNotifications = asyncHandler(async (req, res) => {
+  const notifications = await Notification.find({
+    userId: req.user._id,
+    isRead: true,
+  });
+  if (!notifications) {
+    return res.status(404, new ApiResponse(404, [], "No notifications"));
+  }
+  res
+    .status(200)
+    .json(new ApiResponse(200, { notifications }, "Notifications are listed"));
+});
+
 const getNotificationDetails = asyncHandler(async (req, res) => {
   const id = req.params.id;
 
@@ -313,6 +326,149 @@ const getNotificationDetails = asyncHandler(async (req, res) => {
     );
 });
 
+const markNotificationAsSeen = asyncHandler(async (req, res) => {
+  const id = req.params.id;
+
+  if (!id) {
+    throw new ApiError(400, "Notification ID is required");
+  }
+
+  const notification = await Notification.findOneAndUpdate(
+    {
+      userId: req.user._id,
+      _id: id,
+    },
+    {
+      isRead: true,
+    },
+    { new: true }
+  );
+
+  if (!notification) {
+    return res
+      .status(404)
+      .json(new ApiResponse(404, [], "Notification not found"));
+  }
+
+  res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        { notification },
+        "Notification marked as read successfully"
+      )
+    );
+});
+
+const markNotificationsAsSeen = asyncHandler(async (req, res) => {
+  const { notificationIds } = req.body;
+
+  if (
+    !notificationIds ||
+    !Array.isArray(notificationIds) ||
+    notificationIds.length === 0
+  ) {
+    throw new ApiError(
+      400,
+      "Notification IDs are required and should be an array"
+    );
+  }
+
+  const result = await Notification.updateMany(
+    {
+      userId: req.user._id,
+      _id: { $in: notificationIds },
+      isRead: false,
+    },
+    {
+      $set: { isRead: true },
+    },
+    { new: true }
+  );
+
+  if (result.nModified === 0) {
+    return res
+      .status(404)
+      .json(new ApiResponse(404, [], "No notifications were marked as read"));
+  }
+
+  res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        { modifiedCount: result.nModified },
+        "Notifications marked as read successfully"
+      )
+    );
+});
+
+const deleteNotification = asyncHandler(async (req, res) => {
+  const id = req.params.id;
+
+  if (!id) {
+    throw new ApiError(400, "Notification ID is required");
+  }
+
+  const notification = await Notification.findOneAndDelete({
+    userId: req.user._id,
+    _id: id,
+  });
+
+  if (!notification) {
+    return res
+      .status(404)
+      .json(new ApiResponse(404, [], "Notification not found"));
+  }
+
+  res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        { notification },
+        "Notification deleted successfully"
+      )
+    );
+});
+
+const deleteNotifications = asyncHandler(async (req, res) => {
+  const { notificationIds } = req.body;
+
+  if (
+    !notificationIds ||
+    !Array.isArray(notificationIds) ||
+    notificationIds.length === 0
+  ) {
+    throw new ApiError(
+      400,
+      "Notification IDs are required and should be an array"
+    );
+  }
+
+  const result = await Notification.deleteMany({
+    userId: req.user._id,
+    _id: { $in: notificationIds },
+  });
+
+  if (result.deletedCount === 0) {
+    return res
+      .status(404)
+      .json(new ApiResponse(404, [], "No notifications were deleted"));
+  }
+
+  res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        { deletedCount: result.deletedCount },
+        "Notifications deleted successfully"
+      )
+    );
+});
+
 export {
   changeUserRole,
   list,
@@ -323,5 +479,10 @@ export {
   updateUserImage,
   destroy,
   getUnseenNotifications,
+  getSeenNotifications,
   getNotificationDetails,
+  markNotificationAsSeen,
+  markNotificationsAsSeen,
+  deleteNotification,
+  deleteNotifications
 };

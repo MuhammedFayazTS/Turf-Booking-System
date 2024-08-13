@@ -22,18 +22,13 @@ import {
   ShieldExclamationIcon,
 } from '@heroicons/react/24/solid';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getNotificationDetails } from '../../redux/slices/notification.slice';
+import {
+  deleteNotification,
+  getNotificationDetails,
+  markNotificationAsSeen,
+} from '../../redux/slices/notification.slice';
 import { useDispatch, useSelector } from 'react-redux';
 import { TrashIcon } from '@heroicons/react/24/outline';
-
-// Fake notification object
-const fakeNotification = {
-  type: 'success',
-  title: 'Notification Title',
-  message: 'This is a detailed message of the notification. It could be quite long, depending on the content.',
-  date: '2024-08-09T14:32:00Z',
-  onClickPath: '/details', // Hypothetical path for view details link
-};
 
 const NotificationView = () => {
   const navigate = useNavigate();
@@ -77,8 +72,18 @@ const NotificationView = () => {
   };
 
   useEffect(() => {
-    dispatch(getNotificationDetails(id));
+    const initalizeNotificationDetails = async () => {
+      await dispatch(markNotificationAsSeen(id));
+      await dispatch(getNotificationDetails(id));
+    };
+
+    initalizeNotificationDetails();
   }, [dispatch, id]);
+
+  const deleteSingleNotification = async () => {
+    await dispatch(deleteNotification(id));
+    navigate(-1);
+  };
 
   return (
     <Box p={5} w="100%" h={'80vh'} mx="auto">
@@ -106,11 +111,7 @@ const NotificationView = () => {
             {notificationDetails.message}
           </Text>
           <Box>
-            <Button
-              leftIcon={<TrashIcon className="w-5 h-5" />}
-              colorScheme="red"
-              onClick={() => console.log('Delete api')}
-            >
+            <Button leftIcon={<TrashIcon className="w-5 h-5" />} colorScheme="red" onClick={deleteSingleNotification}>
               Delete
             </Button>
           </Box>

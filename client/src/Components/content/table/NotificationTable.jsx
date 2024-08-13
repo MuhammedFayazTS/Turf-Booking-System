@@ -13,6 +13,7 @@ import {
   ButtonGroup,
   Tooltip,
   Tfoot,
+  Flex,
 } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
 import {
@@ -25,11 +26,21 @@ import {
 } from '@heroicons/react/24/solid';
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+import { deleteNotification, markNotificationAsSeen } from '../../../redux/slices/notification.slice';
+import { useDispatch } from 'react-redux';
 
-const NotificationTable = ({ notifications, noNotificationsMessage, markAllAsRead, deleteAll, loading = false }) => {
+const NotificationTable = ({
+  notifications,
+  noNotificationsMessage,
+  markAllAsRead,
+  deleteAll,
+  showMarkAsReadButton,
+  loading = false,
+}) => {
   const showActions = useBreakpointValue({ base: false, md: true });
   const [selected, setSelected] = useState(new Set());
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   if (loading) {
     return <p className="text-center text-gray-500">Loading notifications...</p>;
@@ -101,21 +112,51 @@ const NotificationTable = ({ notifications, noNotificationsMessage, markAllAsRea
     navigate(`/profile/notification/${id}`);
   };
 
+  const markAsRead = async (e, id) => {
+    e.stopPropagation();
+    await dispatch(markNotificationAsSeen(id));
+  };
+
+  const markSelectedNotificationsAsRead = () => {
+    markAllAsRead(Array.from(selected));
+    setSelected(new Set());
+  };
+
+  const deleteSelectedNotifications = () => {
+    deleteAll(Array.from(selected));
+    setSelected(new Set());
+  };
+
+  const deleteSingleNotification = async (e, id) => {
+    e.stopPropagation();
+    await dispatch(deleteNotification(id));
+  };
+
   return (
     <>
-      {markAllAsRead && (
-        <div className="flex justify-end mb-2 px-3">
-          <Button variant="link" colorScheme="green" onClick={markAllAsRead}>
-            Mark all as read
-          </Button>
-        </div>
-      )}
-      {deleteAll && (
-        <div className="flex justify-end mb-2 px-3">
-          <Button variant="link" colorScheme="red" onClick={deleteAll}>
-            Delete all
-          </Button>
-        </div>
+      {selected.size > 0 && (
+        <Flex justify={'end'}>
+          <ButtonGroup>
+            {showMarkAsReadButton && (
+              <Button
+                leftIcon={<EnvelopeOpenIcon className="w-4 h-4" />}
+                colorScheme="green"
+                size={'sm'}
+                onClick={markSelectedNotificationsAsRead}
+              >
+                Mark all as read
+              </Button>
+            )}
+            <Button
+              leftIcon={<TrashIcon className="w-4 h-4" />}
+              colorScheme="red"
+              size={'sm'}
+              onClick={deleteSelectedNotifications}
+            >
+              Delete all
+            </Button>
+          </ButtonGroup>
+        </Flex>
       )}
       <Table variant="simple">
         <Thead>
@@ -153,20 +194,22 @@ const NotificationTable = ({ notifications, noNotificationsMessage, markAllAsRea
               <Td>
                 {showActions ? (
                   <ButtonGroup>
+                    {showMarkAsReadButton && (
+                      <IconButton
+                        onClick={(e) => markAsRead(e, notification?._id)}
+                        size="md"
+                        isRound
+                        variant="ghost"
+                        colorScheme="blackAlpha"
+                        isDisabled={selected.has(notification?._id)}
+                      >
+                        <Tooltip label="Mark as read">
+                          <EnvelopeOpenIcon className="w-5 h-5" />
+                        </Tooltip>
+                      </IconButton>
+                    )}
                     <IconButton
-                      onClick={(e) => e.stopPropagation()} // Prevent row click
-                      size="md"
-                      isRound
-                      variant="ghost"
-                      colorScheme="blackAlpha"
-                      isDisabled={selected.has(notification?._id)}
-                    >
-                      <Tooltip label="Mark as read">
-                        <EnvelopeOpenIcon className="w-5 h-5" />
-                      </Tooltip>
-                    </IconButton>
-                    <IconButton
-                      onClick={(e) => e.stopPropagation()} // Prevent row click
+                      onClick={(e) => deleteSingleNotification(e, notification?._id)}
                       size="md"
                       isRound
                       variant="ghost"
@@ -187,11 +230,6 @@ const NotificationTable = ({ notifications, noNotificationsMessage, markAllAsRea
             </motion.tr>
           ))}
         </Tbody>
-        <Tfoot>
-          <Button variant="link" colorScheme="red" onClick={deleteAll}>
-            Delete all
-          </Button>
-        </Tfoot>
       </Table>
     </>
   );

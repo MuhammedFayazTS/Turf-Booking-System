@@ -3,12 +3,15 @@ import {
   Avatar,
   Button,
   ButtonGroup,
+  Divider,
   FormLabel,
   Grid,
   GridItem,
+  Heading,
   Input,
   Radio,
   RadioGroup,
+  Spinner,
   Stack,
   useToast,
 } from '@chakra-ui/react';
@@ -28,24 +31,17 @@ function EditProfile() {
   const [profilePic, setProfilePic] = useState('');
   const { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
-  const fileInputRef = useRef(null);
 
   useEffect(() => {
     setProfilePic(user?.image || '');
   }, [user]);
 
-  const handleChangeImage = (e) => {
-    if (e.target.files?.[0]) {
-      setProfilePic(e.target.files[0]);
-    }
-  };
-
   const handleSubmit = async (values) => {
-    await dispatch(updateUserDetails(values))
+    await dispatch(updateUserDetails(values));
   };
 
   if (!user) {
-    return <div>Loading your data...</div>;
+    return <Spinner colorScheme="whatsapp" />;
   }
 
   const handleFileUpload = async (values) => {
@@ -71,6 +67,7 @@ function EditProfile() {
             <Grid templateColumns={{ base: 'repeat(1, 1fr)', md: 'repeat(3, 1fr)' }} gap={6}>
               <GridItem colSpan={{ base: 1, md: 3 }} w="100%" h="fit-content" mt={3}>
                 <h2 className="text-2xl font-semibold text-gray-600 text-center md:text-left">Update Your Profile</h2>
+                <Divider mt={2} />
               </GridItem>
 
               <GridItem
@@ -87,23 +84,14 @@ function EditProfile() {
                     profilePic ? (typeof profilePic === 'string' ? profilePic : URL.createObjectURL(profilePic)) : null
                   }
                 />
-                <FormLabel>
-                  <FileUploaderModal
-                    buttonText="Change Image"
-                    colorScheme="blackAlpha"
-                    variant="ghost"
-                    title={'Change Image'}
-                    isRound
-                    onUpload={handleFileUpload}
-                  />
-                  <Input
-                    type="file"
-                    accept="image/png, image/jpg, image/jpeg"
-                    ref={fileInputRef}
-                    style={{ display: 'none' }}
-                    onChange={handleChangeImage}
-                  />
-                </FormLabel>
+                <FileUploaderModal
+                  buttonText="Change Image"
+                  colorScheme="blackAlpha"
+                  variant="ghost"
+                  title={'Change Image'}
+                  isRound
+                  onUpload={handleFileUpload}
+                />
               </GridItem>
 
               <GridItem colSpan={{ base: 1, md: 2 }} w="100%" h="fit-content">
@@ -157,9 +145,7 @@ function EditProfile() {
                   <Button type="submit" colorScheme="green">
                     Update
                   </Button>
-                  <Button type="reset">
-                    Reset
-                  </Button>
+                  <Button type="reset">Reset</Button>
                 </ButtonGroup>
               </GridItem>
             </Grid>
