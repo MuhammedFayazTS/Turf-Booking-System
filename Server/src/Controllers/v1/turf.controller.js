@@ -1,6 +1,8 @@
 import Turf from "../../models/turf.model.js";
 import TimingOptions from "../../models/timing.options.model.js";
 import Timing from "../../models/timing.model.js";
+import Sport from "../../models/sports.model.js";
+import Amenities from "../../models/amenity.model.js";
 import { asyncHandler } from "../../utils/asyncHandler.js";
 import { ApiResponse } from "../../utils/ApiResponse.js";
 import Joi from "@hapi/joi";
@@ -162,7 +164,7 @@ const create = asyncHandler(async (req, res, next) => {
 
     sendAdminNotifications(title, message, "info", data);
     //notification to owner asking to wait for approval
-    const notificationTitleForOwner = "Turf Addition Request Sent Successfully";
+    const notificationTitleForOwner = "Turf Add Request Sent Successfully";
     const notificationMessageForOwner =
       "Your request to add a new turf has been successfully submitted. Please await approval from the administrator.";
 
@@ -181,10 +183,24 @@ const create = asyncHandler(async (req, res, next) => {
 });
 
 const list = asyncHandler(async (req, res) => {
-  const { limit = 10, page = 1, search = "", status = "approved" } = req.query;
+  let {
+    limit = 10,
+    page = 1,
+    search = "",
+    status = "approved",
+    location = "",
+  } = req.query;
 
-  // Create a search query if a search term is provided
-  const searchQuery = {
+  if (location === "all") {
+    location = "";
+  }
+
+  // Convert limit and page to numbers
+  const limitNum = parseInt(limit, 10);
+  const pageNum = parseInt(page, 10);
+
+  // Define match conditions based on status and location
+  const matchConditions = {
     status,
     ...(search && {
       $or: [
@@ -192,14 +208,13 @@ const list = asyncHandler(async (req, res) => {
         { "location.name": { $regex: search, $options: "i" } },
       ],
     }),
+    ...(location && { "location.name": { $regex: location, $options: "i" } }),
   };
-
-  const { limitNum, skip, pageNum } = getPagination(page, limit);
 
   // Create the aggregation pipeline
   const pipeline = [
     {
-      $match: searchQuery,
+      $match: matchConditions,
     },
     {
       $lookup: {
@@ -222,51 +237,38 @@ const list = asyncHandler(async (req, res) => {
       },
     },
     {
-      $skip: skip,
-    },
-    {
-      $limit: limitNum,
-    },
-  ];
-
-  // Retrieve the total count of matching documents
-  const totalCountPipeline = [
-    {
-      $match: searchQuery,
-    },
-    {
-      $lookup: {
-        from: "users",
-        localField: "createdUserId",
-        foreignField: "_id",
-        as: "ownerDeletedStatus",
+      $facet: {
+        paginatedResults: [
+          { $skip: (pageNum - 1) * limitNum },
+          { $limit: limitNum },
+        ],
+        totalCount: [
+          {
+            $count: "count",
+          },
+        ],
       },
+    },
+    {
+      $unwind: { path: "$totalCount", preserveNullAndEmptyArrays: true },
     },
     {
       $addFields: {
-        ownerDeletedStatus: {
-          $first: "$ownerDeletedStatus.deleted",
-        },
+        totalCount: "$totalCount.count",
       },
-    },
-    {
-      $match: {
-        ownerDeletedStatus: { $ne: true },
-      },
-    },
-    {
-      $count: "totalCount",
     },
   ];
 
-  // Retrieve the total count of matching documents
-  const [totalCountResult] = await Turf.aggregate(totalCountPipeline);
-  const totalCount = totalCountResult ? totalCountResult.totalCount : 0;
+  // Execute the aggregation pipeline
+  const [result] = await Turf.aggregate(pipeline);
 
-  // Retrieve the paginated list of turfs
-  const turfs = await Turf.aggregate(pipeline);
+  // Extract paginatedResults and totalCount from the result
+  const { paginatedResults, totalCount } = result || {
+    paginatedResults: [],
+    totalCount: 0,
+  };
 
-  if (!turfs || turfs.length === 0) {
+  if (!paginatedResults || paginatedResults.length === 0) {
     return res.status(404).json(new ApiResponse(404, {}, "No turfs found"));
   }
 
@@ -279,7 +281,7 @@ const list = asyncHandler(async (req, res) => {
     totalPages,
     currentPage: pageNum,
     pageSize: limitNum,
-    turfs,
+    turfs: paginatedResults,
   };
 
   res
@@ -328,13 +330,74 @@ const listForOwner = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, response, "Turfs listed successfully"));
 });
 
+const listTurfsForHome = asyncHandler(async (req, res) => {
+  const { limit = 4, status = "approved", location = "" } = req.query;
+
+  const limitNum = parseInt(limit, 10);
+
+  const filter = {
+    status,
+  };
+
+  // If a location is provided, add it to the filter (Assuming you have a field for location in your Turf model)
+  if (location) {
+    filter.location = location;
+  }
+
+  const pipeline = [
+    {
+      $match: filter,
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "createdUserId",
+        foreignField: "_id",
+        as: "ownerInfo",
+      },
+    },
+    {
+      $addFields: {
+        ownerDeletedStatus: {
+          $first: "$ownerInfo.deleted",
+        },
+      },
+    },
+    {
+      $match: {
+        ownerDeletedStatus: { $ne: true },
+      },
+    },
+    {
+      $limit: limitNum,
+    },
+  ];
+
+  const turfs = await Turf.aggregate(pipeline);
+
+  if (!turfs || turfs.length === 0) {
+    return res.status(404).json(new ApiResponse(404, {}, "No turfs found"));
+  }
+
+  const response = {
+    turfs,
+  };
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, response, "Turf listed successfully"));
+});
+
 const getOne = asyncHandler(async (req, res) => {
   const { id } = req.params;
   if (!id) {
     throw new ApiError(400, "Invalid turf id", "Invalid turf id");
   }
 
-  const turf = await Turf.findById(id);
+  const turf = await Turf.findById(id)
+    .populate("timingsId")
+    .populate("sportsId")
+    .populate("amenitiesId");
 
   if (!turf) {
     return res.status(404).json(new ApiResponse(404, {}, "Turf not found"));
@@ -568,4 +631,5 @@ export {
   updateTurfDetails,
   updateTurfImages,
   updateTurfDocuments,
+  listTurfsForHome,
 };

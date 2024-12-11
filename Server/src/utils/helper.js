@@ -1,6 +1,7 @@
 import { uploadOnCloudinary } from "../services/cloudinary.js";
 import { ApiError } from "./ApiError.js";
 import { faker } from "@faker-js/faker";
+import jwt from "jsonwebtoken";
 
 export const createAccessToken = async (user) => {
   if (!env.JWT_KEY) return;
@@ -101,4 +102,34 @@ export const getPagination = (page = 1, limit = 10) => {
   const skip = (pageNum - 1) * limitNum;
 
   return { skip, limitNum, pageNum };
+};
+
+/**
+ * Calculate token expiry.
+ * @param {string} accessToken - The JWT access token.
+ * @returns {Date} - The expiry date of the token.
+ * @throws {Error} - Throws an error if the token is invalid.
+ */
+export const getTokenExpiry = (accessToken) => {
+  if (!accessToken) {
+    throw new Error("Access token is required");
+  }
+
+  try {
+    const decodedToken = jwt.verify(
+      accessToken,
+      process.env.ACCESS_TOKEN_SECRET
+    );
+
+    if (!decodedToken || !decodedToken.exp) {
+      throw new Error("Invalid token");
+    }
+
+    const tokenExpiry = new Date(0);
+    tokenExpiry.setUTCSeconds(decodedToken.exp);
+
+    return tokenExpiry;
+  } catch (error) {
+    throw new Error("Failed to verify token: " + error.message);
+  }
 };

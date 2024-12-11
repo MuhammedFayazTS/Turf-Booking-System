@@ -1,39 +1,49 @@
 import { Toaster } from 'react-hot-toast';
-import { useSelector } from 'react-redux'
-import loader from './Assets/lottie/loader.json'
-import Lottie from 'react-lottie-player'
-import AllRoutes from './Routes/AllRoutes';
+import { useDispatch, useSelector } from 'react-redux';
+import Routes from './Routes/Index';
 import { ScrollToTop } from 'react-simple-scroll-up';
 import { ArrowUpIcon } from '@heroicons/react/24/solid';
-
-
+import axios from 'axios';
+import Loader from './Components/core/loader/Loader';
+import useAxiosInterceptors from './hooks/useApiInterceptors';
+import { useEffect } from 'react';
+import { loadUser } from './redux/slices/auth.slice';
+import { useLocation } from 'react-router-dom';
 
 function App() {
-  const { loading } = useSelector(state => state.alerts)
+  axios.defaults.baseURL = process.env.REACT_APP_API;
+  axios.defaults.withCredentials = true;
+  const { loading: userLoading, isAuthenticated, user } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
+  const location = useLocation();
+
+  useAxiosInterceptors();
+
+  useEffect(() => {
+    const publicPaths = ['/sign-in', '/sign-up'];
+
+    if (!isAuthenticated && !publicPaths.includes(location.pathname) && !userLoading) {
+      dispatch(loadUser());
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, isAuthenticated, location.pathname]);
 
   return (
     <>
-      <Toaster
-        position="top-center"
-        reverseOrder={false}
+      <Toaster position="top-center" reverseOrder={false} />
+
+      {/* //TODO: Replace with loading form app slice */}
+      {userLoading && <Loader />}
+
+      <ScrollToTop
+        className="z-20"
+        strokeWidth={3}
+        strokeFillColor={'#166534'}
+        bgColor={'#16A34A'}
+        symbol={<ArrowUpIcon className="w-6 h-6 text-gray-200" />}
       />
 
-      {loading && <div className="w-full h-screen flex justify-center items-center fixed top-0 backdrop-blur-[2px] left-0 z-50"
-        style={{ background: 'rgba(0,0,0,0.7)' }}>
-        <Lottie
-          loop
-          animationData={loader}
-          play
-          style={{ width: 150, height: 150 }}
-        />
-      </div>}
-
-      <ScrollToTop className='z-20' strokeWidth={3} strokeFillColor={'#166534'} bgColor={'#16A34A'} symbol={<ArrowUpIcon className='w-6 h-6 text-gray-200' />} />
-
-
-      {/* routes */}
-      <AllRoutes />
-
+      <Routes />
     </>
   );
 }
